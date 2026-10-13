@@ -125,7 +125,7 @@ h1,h2,h3,.metric{font-family:Literata,Georgia,serif}
 .word-prompt{font:500 clamp(1.07rem,2vw,1.4rem)/1.25 Literata,Georgia,serif;margin:18px 0 2px;color:#333C49}
 .hero-collage .word-stage{min-height:116px;margin:0}
 .hero-collage .big-word{font-size:clamp(1.72rem,3.3vw,3rem);letter-spacing:-.09em}
-.hero-collage .letter{font:700 inherit;border-radius:6px;min-width:0;padding:.025em}
+.hero-collage .letter{font-weight:700;border-radius:6px;min-width:0;padding:.025em}
 .hero-collage .micro{font-size:.74rem;line-height:1.55;margin:4px 0 0}
 .hero-collage .feedback{font-size:.8rem;padding:9px;margin:3px 0}
 /* Editorial patchwork navigation */
