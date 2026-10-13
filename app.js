@@ -1,0 +1,276 @@
+const $ = (s, root=document) => root.querySelector(s);
+const $$ = (s, root=document) => [...root.querySelectorAll(s)];
+const main = $('#main');
+const toast = $('#toast');
+
+const demoStudents = [
+  {id:'s1', name:'Алина К.', class:'6Б', completion:92, trend:+11, risk:'ПРЕ-/ПРИ-', hints:6, sessions:8},
+  {id:'s2', name:'Марк С.', class:'6Б', completion:78, trend:+4, risk:'Ы/И после приставок', hints:14, sessions:7},
+  {id:'s3', name:'Софья Н.', class:'6Б', completion:96, trend:+15, risk:'перенос в текст', hints:3, sessions:10},
+  {id:'s4', name:'Илья Р.', class:'6Б', completion:64, trend:-2, risk:'КОС-/КАС-', hints:19, sessions:5},
+  {id:'s5', name:'Лев Т.', class:'6Б', completion:83, trend:+7, risk:'соединительные О/Е', hints:8, sessions:8},
+];
+
+const orthograms = [
+  {id:'kos', title:'КОС-/КАС-', source:'Узорова, Нефёдова, 6 класс: правило и упражнения 52–59', rule:'В безударном корне КОС-/КАС- пишется А, если после корня есть суффикс -А-; без этого суффикса — О.', examples:['прикасаться','прикоснуться'], skills:['обнаружить гласную в корне','увидеть суффикс -А- после корня','выбрать букву','объяснить решение']},
+  {id:'gor', title:'ГОР-/ГАР-', source:'Узорова, Нефёдова, 6 класс: правило и упражнения 60–66', rule:'В корнях с чередованием ГОР-/ГАР- в безударном положении пишется О.', examples:['загорать','загар'], skills:['определить ударность','распознать чередующийся корень','применить правило']},
+  {id:'yi', title:'Ы/И после приставок', source:'Узорова, Нефёдова, 6 класс: упражнения 73–83', rule:'После приставки на согласную вместо начального И корня пишется Ы. После СВЕРХ-, МЕЖ-, ДЕЗ-, КОНТР- сохраняется И.', examples:['разыграть','сверхинтересный'], skills:['выделить приставку','найти начальную И в исходном слове','проверить исключающие приставки','выбрать Ы/И']},
+  {id:'prepri', title:'ПРЕ-/ПРИ-', source:'Узорова, Нефёдова, 6 класс: упражнения 84–101; Ларионова: блок «Правописание приставок при- и пре-»', rule:'ПРИ-: присоединение, приближение, близость, неполное действие. ПРЕ-: значение близко к «очень» или к ПЕРЕ-.', examples:['привязать','пресильный'], skills:['заметить приставку','определить значение','соотнести со смысловой группой','проверить написание в контексте']},
+  {id:'oe', title:'Соединительные О/Е', source:'Узорова, Нефёдова, 6 класс: упражнения 102–111', rule:'В сложных словах после твёрдых согласных пишется соединительная О, после мягких согласных, шипящих и Ц — Е.', examples:['паровоз','землемер'], skills:['найти границу основ','определить конечный согласный первой основы','выбрать О/Е']},
+];
+
+const diagnosticTasks = [
+  {id:'d1', type:'spot', stage:1, topic:'kos', title:'Найди опасное место', prompt:'Нажми на букву, где нужно применить орфографическое правило.', word:'прикасаться', correct:[4], explanation:'Опасное место — гласная А в корне -кас-. Сначала важно заметить позицию, а уже потом применять правило.'},
+  {id:'d2', type:'choice', stage:2, topic:'kos', title:'Распознай условие', prompt:'Что определяет выбор А/О в корне КОС-/КАС-?', options:['Есть ли суффикс -А- после корня','Какая часть речи перед нами','Стоит ли слово в конце предложения'], correct:0, explanation:'Для этой орфограммы ключевой признак — суффикс -А- после корня.'},
+  {id:'d3', type:'choice', stage:3, topic:'yi', title:'Выбери написание', prompt:'Как написать слово?', stem:'раз…грать', options:['разыграть','разиграть'], correct:0, explanation:'После приставки раз- на согласную начальное И корня меняется на Ы.'},
+  {id:'d4', type:'choice', stage:2, topic:'prepri', title:'Определи значение', prompt:'Почему в слове «прибежать» пишется ПРИ-?', options:['приближение','значение «очень»','значение ПЕРЕ-'], correct:0, explanation:'В этом слове приставка обозначает приближение.'},
+  {id:'d5', type:'choice', stage:3, topic:'oe', title:'Выбери соединительную гласную', prompt:'Какое написание верно?', options:['паровоз','паревоз'], correct:0, explanation:'После твёрдого согласного первой основы используется соединительная О.'},
+  {id:'d6', type:'editor', stage:4, topic:'kos', title:'Редактор', prompt:'Исправь слово и введи правильный вариант.', text:'прикосаться', expected:'прикасаться', explanation:'В слове есть суффикс -а- после корня, поэтому пишется -кас-.'},
+  {id:'d7', type:'explain', stage:3, topic:'yi', title:'Объясни решение', prompt:'Коротко объясни, почему в слове «сверхинтересный» пишется И.', keywords:['сверх','и'], explanation:'После приставки СВЕРХ- сохраняется И.'}
+];
+
+const trainerBank = [
+  {id:'t1', type:'spot', stage:1, topic:'prepri', title:'ЗАМЕЧАЮ', prompt:'Где находится место выбора в слове?', word:'привязать', correct:[2], explanation:'Ты отметил гласную в приставке при-. Это и есть позиция, где возможна ошибка.'},
+  {id:'t2', type:'choice', stage:2, topic:'prepri', title:'РАСПОЗНАЮ', prompt:'Какое значение у ПРИ- в слове «привязать»?', options:['присоединение','очень','пере-'], correct:0, explanation:'«Привязать» связано с присоединением одного к другому.'},
+  {id:'t3', type:'choice', stage:3, topic:'prepri', title:'ОБЪЯСНЯЮ', prompt:'Выбери алгоритм для слова «приморский».', options:['Определить значение приставки','Проверить ударением','Найти суффикс -А-'], correct:0, explanation:'Для ПРЕ-/ПРИ- сначала определяем значение приставки в конкретном слове.'},
+  {id:'t4', type:'editor', stage:4, topic:'prepri', title:'ПРИМЕНЯЮ', prompt:'Исправь ошибку.', text:'присмешной рассказ', expected:'пресмешной рассказ', explanation:'ПРЕ- здесь близко по значению к «очень»: очень смешной.'},
+  {id:'t5', type:'spot', stage:1, topic:'yi', title:'ЗАМЕЧАЮ', prompt:'Найди букву, где срабатывает правило после приставки.', word:'разыграть', correct:[3], explanation:'Опасное место — Ы после приставки раз-.'},
+  {id:'t6', type:'choice', stage:2, topic:'yi', title:'РАСПОЗНАЮ', prompt:'Какая приставка сохраняет И?', options:['сверх-','раз-','без-'], correct:0, explanation:'После СВЕРХ- сохраняется И.'},
+  {id:'t7', type:'choice', stage:3, topic:'yi', title:'ОБЪЯСНЯЮ', prompt:'Выбери верное написание.', options:['безыдейный','безидейный'], correct:0, explanation:'После приставки без- на согласную начальное И меняется на Ы.'},
+  {id:'t8', type:'editor', stage:4, topic:'yi', title:'ПРИМЕНЯЮ', prompt:'Исправь сочетание.', text:'сверхынтересный проект', expected:'сверхинтересный проект', explanation:'СВЕРХ- входит в группу приставок, после которых И сохраняется.'},
+  {id:'t9', type:'spot', stage:1, topic:'kos', title:'ЗАМЕЧАЮ', prompt:'Найди орфографически опасную гласную.', word:'прикоснуться', correct:[4], explanation:'Опасная гласная — О в корне -кос-.'},
+  {id:'t10', type:'choice', stage:2, topic:'kos', title:'РАСПОЗНАЮ', prompt:'Есть ли после корня суффикс -А- в слове «прикасаться»?', options:['да','нет'], correct:0, explanation:'После корня -кас- есть суффикс -а-.'},
+  {id:'t11', type:'choice', stage:3, topic:'kos', title:'ОБЪЯСНЯЮ', prompt:'Выбери правильную пару.', options:['прикасаться — прикоснуться','прикосаться — прикаснуться'], correct:0, explanation:'Наличие суффикса -А- после корня определяет написание -кас-.'},
+  {id:'t12', type:'editor', stage:4, topic:'kos', title:'ПРИМЕНЯЮ', prompt:'Исправь предложение.', text:'Не прикосайся к стеклу.', expected:'Не прикасайся к стеклу.', explanation:'В форме «прикасайся» после корня стоит -а-, поэтому пишется -кас-.'},
+  {id:'t13', type:'choice', stage:1, topic:'oe', title:'ЗАМЕЧАЮ', prompt:'Где находится соединительная гласная в слове «паровоз»?', options:['между двумя основами','в окончании','в приставке'], correct:0, explanation:'Соединительная гласная связывает основы сложного слова.'},
+  {id:'t14', type:'choice', stage:2, topic:'oe', title:'РАСПОЗНАЮ', prompt:'После какого согласного первой основы обычно выбираем О?', options:['твёрдого','мягкого','шипящего'], correct:0, explanation:'После твёрдого согласного пишется соединительная О.'},
+  {id:'t15', type:'editor', stage:4, topic:'oe', title:'ПРИМЕНЯЮ', prompt:'Исправь слово.', text:'паревоз', expected:'паровоз', explanation:'После твёрдого Р первой основы — соединительная О.'}
+];
+
+const basePassport = {
+  detection:72, recognition:64, ruleUse:76, selfCorrection:58, transfer:61,
+  mastered:['ГОР-/ГАР-'], training:['ПРЕ-/ПРИ-','Ы/И после приставок'],
+  recurrent:['не всегда определяет смысл ПРИ-','после СВЕРХ- иногда выбирает Ы'],
+  speed:'22 с/задание', streak:6,
+};
+
+let state = JSON.parse(localStorage.getItem('orfozor-state') || 'null') || {
+  diagnosticIndex:0, diagnosticResults:[], diagnosticDone:false,
+  trainingIndex:0, trainingQueue:['t1','t2','t3','t4','t5','t6'], trainingResults:[],
+  hintsUsed:0, currentHint:0, lastStudentId:'s4',
+};
+function save(){localStorage.setItem('orfozor-state',JSON.stringify(state));}
+function resetDemo(){localStorage.removeItem('orfozor-state'); location.hash='#home'; location.reload();}
+function showToast(msg){toast.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2200)}
+
+const routeMap = {
+  home:renderHome, diagnosis:renderDiagnosis, trainer:renderTrainer, result:renderResult,
+  passport:renderPassport, student:renderStudent, teacher:renderTeacher, class:renderClass,
+  studentprofile:renderStudentProfile, creator:renderCreator, library:renderLibrary,
+  research:renderResearch, method:renderMethod, about:renderAbout
+};
+function navigate(route){location.hash='#'+route;}
+function route(){const r=(location.hash||'#home').slice(1).split('?')[0];(routeMap[r]||renderHome)();window.scrollTo(0,0);closeMenu();}
+window.addEventListener('hashchange',route);
+document.addEventListener('click',e=>{const btn=e.target.closest('[data-route]');if(btn) navigate(btn.dataset.route)});
+$('#navToggle').addEventListener('click',()=>{const n=$('#mainNav');const open=n.classList.toggle('open');$('#navToggle').setAttribute('aria-expanded',open)});
+function closeMenu(){$('#mainNav').classList.remove('open');$('#navToggle').setAttribute('aria-expanded','false')}
+
+function page(inner, cls=''){main.innerHTML=`<div class="page ${cls}">${inner}<div class="footer-note">ОрфоЗор AI · интерактивный демонстрационный прототип. Все данные учеников вымышлены и обезличены.</div></div>`}
+function metricCard(title,value,sub,extra=''){return `<article class="card ${extra}"><h3>${title}</h3><div class="metric">${value}</div><div class="metric-sub">${sub}</div></article>`}
+function progress(label,value){return `<div class="progress-label"><span>${label}</span><strong>${value}%</strong></div><div class="progress" aria-label="${label}: ${value}%"><span style="width:${value}%"></span></div>`}
+
+function renderHome(){
+ page(`
+  <section class="hero">
+    <div>
+      <p class="eyebrow">Персональный тренажёр · 5–6 класс</p>
+      <h1>ОРФО<span>ЗОР</span> AI</h1>
+      <p class="hero-copy">Не просто запоминай написание. <strong>Учись замечать место, где может появиться ошибка.</strong> Система различает: орфограмму не заметили, неверно распознали, ошиблись в алгоритме или допустили случайную опечатку.</p>
+      <div class="hero-actions"><button class="btn blue" data-route="diagnosis">Начать диагностику</button><button class="btn secondary" data-route="teacher">Войти как учитель</button></div>
+    </div>
+    <div class="hero-demo" aria-label="Интерактивный пример">
+      <div class="demo-label"><span>Попробуй сейчас</span><span>1 действие</span></div>
+      <div class="word-stage"><div class="big-word" id="heroWord" aria-label="Слово прикасаться"></div></div>
+      <div id="heroFeedback" class="feedback" aria-live="polite"></div>
+      <p class="micro">Нажми на букву, где нужно применить орфографическое правило.</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="section-head"><div><p class="eyebrow">Как работает ОрфоЗор</p><h2>Не тест. Маршрут.</h2></div><p class="section-intro">Каждый ответ меняет следующее педагогическое действие: усиливает опору, возвращает к распознаванию или переводит навык в предложение и текст.</p></div>
+    <div class="flow"><div class="flow-step"><b>01 Диагностика</b>Проверяем не только букву, но и умение заметить орфограмму.</div><div class="flow-step"><b>02 Анализ</b>Определяем этап, где возникло затруднение.</div><div class="flow-step"><b>03 Тренировка</b>Подбираем механику под конкретную операцию.</div><div class="flow-step"><b>04 Повторение</b>Возвращаем тему позже и в новом контексте.</div><div class="flow-step"><b>05 Динамика</b>Показываем рост по навыкам, а не только «баллы».</div></div>
+  </section>
+  <section class="section"><div class="grid">
+    ${metricCard('Главный фокус','ЗАМЕЧАТЬ','опасное место до выбора буквы','yellow')}
+    ${metricCard('4 ступени','1 → 4','замечаю · распознаю · объясняю · применяю')}
+    ${metricCard('Роль ИИ','АДАПТАЦИЯ','не источник правил; учитель может изменить решение','blue')}
+  </div></section>
+ `);
+ renderClickableWord('heroWord','прикасаться',[4],(ok)=>{const f=$('#heroFeedback');f.className='feedback show '+(ok?'ok':'retry');f.innerHTML=ok?'✅ <strong>Верно.</strong> Ты заметил орфограмму до проверки.':'↺ <strong>Попробуй ещё.</strong> Сначала найди гласную в корне, где выбирается А/О.'});
+}
+
+function renderClickableWord(containerId, word, correctIndices, cb){
+ const box=$('#'+containerId); if(!box)return;
+ box.innerHTML=[...word].map((ch,i)=>`<button class="letter" aria-label="Буква ${ch}, позиция ${i+1}" data-i="${i}">${ch}</button>`).join('');
+ $$('.letter',box).forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.i;$$('.letter',box).forEach(x=>x.classList.remove('selected'));b.classList.add('selected');const ok=correctIndices.includes(i);if(ok)b.classList.add('correct');cb(ok,i)}));
+}
+
+function renderDiagnosis(){
+ if(state.diagnosticDone){navigate('result');return}
+ const t=diagnosticTasks[state.diagnosticIndex];
+ const pct=Math.round((state.diagnosticIndex/diagnosticTasks.length)*100);
+ page(`<section class="task-shell">
+  <p class="eyebrow">Стартовая диагностика</p>
+  <div class="task-top"><div><div class="task-type">${t.title}</div><h1>${t.prompt}</h1></div><div style="min-width:180px">${progress(`${state.diagnosticIndex+1} из ${diagnosticTasks.length}`,pct)}</div></div>
+  <div class="callout"><strong>Давай узнаем, какие задания тебе уже даются легко, а что стоит потренировать.</strong> Это не контрольная работа. Здесь важно понять, как ты рассуждаешь.</div>
+  <div class="task-card" id="diagnosticTask"></div>
+ </section>`,'compact');
+ renderTask(t,'diagnosticTask','diagnostic');
+}
+
+function taskBody(t, mode){
+ const feedback=`<div class="feedback" id="taskFeedback" aria-live="polite"></div><div id="hintArea"></div>`;
+ const footer=`<div class="task-footer"><div class="why-box">${mode==='training'?'Следующее задание выбирается по твоему предыдущему действию.':'Система сохраняет: правильность, попытки, время и тип затруднения.'}</div><div class="actions" style="margin:0"><button class="btn secondary small" id="hintBtn">Подсказка</button><button class="btn blue" id="checkBtn">Проверить</button></div></div>`;
+ if(t.type==='spot') return `<div class="big-word" id="taskWord"></div>${feedback}${footer}`;
+ if(t.type==='choice') return `${t.stem?`<div class="metric" style="font-size:2rem">${t.stem}</div>`:''}<div class="choice-list">${t.options.map((o,i)=>`<button class="choice" data-choice="${i}">${o}</button>`).join('')}</div>${feedback}${footer}`;
+ if(t.type==='editor') return `<div class="pill yellow">Текст с ошибкой</div><div class="metric" style="font-size:clamp(1.8rem,5vw,3.4rem);margin:24px 0">${t.text}</div><div class="field"><label for="editorInput">Твой вариант</label><input class="text-input" id="editorInput" autocomplete="off" /></div>${feedback}${footer}`;
+ if(t.type==='explain') return `<div class="metric" style="font-size:clamp(1.8rem,5vw,3.4rem);margin:24px 0">сверхинтересный</div><div class="field"><label for="explainInput">Объяснение своими словами</label><textarea id="explainInput" placeholder="Например: после ... сохраняется ..."></textarea></div><p class="micro">В демо анализируется наличие смысловых компонентов, а не стиль речи.</p>${feedback}${footer}`;
+}
+
+function renderTask(t, containerId, mode){
+ const c=$('#'+containerId); c.innerHTML=taskBody(t,mode);
+ let selected=null, attempts=0, start=Date.now(), completed=false, completedElapsed=0;
+ if(t.type==='spot') renderClickableWord('taskWord',t.word,t.correct,(_,i)=>selected=i);
+ if(t.type==='choice') $$('.choice',c).forEach(b=>b.addEventListener('click',()=>{$$('.choice',c).forEach(x=>x.classList.remove('selected'));b.classList.add('selected');selected=+b.dataset.choice}));
+ $('#hintBtn',c).addEventListener('click',()=>{ if(!completed) useHint(t,c); });
+ const checkBtn=$('#checkBtn',c);
+ checkBtn.addEventListener('click',()=>{
+   if(completed){finishTask(t,mode,true,attempts,completedElapsed);return;}
+   attempts++;
+   let ok=false;
+   if(t.type==='spot'){ if(selected===null){attempts--;showToast('Сначала выбери букву.');return} ok=t.correct.includes(selected); }
+   if(t.type==='choice'){ if(selected===null){attempts--;showToast('Сначала выбери вариант.');return} ok=selected===t.correct; }
+   if(t.type==='editor'){const v=$('#editorInput',c).value.trim().replace(/\s+/g,' ').toLowerCase();if(!v){attempts--;showToast('Введи свой вариант.');return}ok=v===t.expected.toLowerCase();}
+   if(t.type==='explain'){const v=$('#explainInput',c).value.trim().toLowerCase();if(!v){attempts--;showToast('Напиши короткое объяснение.');return}ok=t.keywords.every(k=>v.includes(k));}
+   const elapsed=Math.max(1,Math.round((Date.now()-start)/1000));
+   const f=$('#taskFeedback',c);f.className='feedback show '+(ok?'ok':'retry');
+   if(ok){
+     completed=true; completedElapsed=elapsed;
+     f.innerHTML=`<span class="icon">✅</span><strong>Верно.</strong> ${t.explanation}`;
+     checkBtn.textContent=mode==='diagnostic'?'Дальше':'Следующее';
+     $('#hintBtn',c).disabled=true;
+   } else {
+     f.innerHTML=`<span class="icon">↺</span><strong>Пока не совпало.</strong> ${errorFeedback(t,mode)}`;
+     recordSoftError(t,mode,attempts,elapsed);
+   }
+ });
+}
+function errorFeedback(t){
+ if(t.stage===1) return 'Посмотри ещё раз на слово: сначала нужно заметить опасное место.';
+ if(t.stage===2) return 'Орфограмму ты видишь. Теперь проверь, правильно ли определён её тип или смысл.';
+ if(t.stage===3) return 'Ошибка появилась на этапе выбора алгоритма. Используй подсказку, если нужно.';
+ return 'Попробуй исправить себя самостоятельно. Правильный ответ пока не показываем.';
+}
+function useHint(t,c){
+ state.hintsUsed++; state.currentHint=(state.currentHint%3)+1; save();
+ const hints={1:'Вопрос к себе: какую часть слова я сейчас проверяю?',2:t.topic==='prepri'?'Определи значение приставки: присоединение / приближение / близость / неполнота или «очень» / ПЕРЕ-.':t.topic==='yi'?'Сначала выдели приставку и посмотри, на согласную ли она заканчивается.':t.topic==='kos'?'Посмотри, есть ли сразу после корня суффикс -А-.':'Найди границу двух основ.',3:t.explanation};
+ $('#hintArea',c).innerHTML=`<div class="hint-box"><strong>Подсказка ${state.currentHint}/3.</strong> ${hints[state.currentHint]}</div>`;
+}
+function recordSoftError(t,mode,attempts,elapsed){
+ // Ошибки до финального ответа учитываются как попытки; событие сохраняется после завершения задания.
+}
+function finishTask(t,mode,ok,attempts,elapsed){
+ const result={taskId:t.id,topic:t.topic,stage:t.stage,ok,attempts,hints:state.currentHint,time:elapsed,ts:Date.now()};
+ state.currentHint=0;
+ if(mode==='diagnostic'){
+   state.diagnosticResults.push(result);state.diagnosticIndex++;
+   if(state.diagnosticIndex>=diagnosticTasks.length){state.diagnosticDone=true;save();navigate('result')} else {save();renderDiagnosis()}
+ } else {
+   state.trainingResults.push(result);
+   adaptQueue(t,result);
+   state.trainingIndex++;
+   save();
+   if(state.trainingIndex>=Math.min(state.trainingQueue.length,8)) navigate('result'); else renderTrainer();
+ }
+}
+function adaptQueue(task,result){
+ const topic=task.topic;
+ if(result.attempts>=2 || result.hints>=2){
+   const fallback=trainerBank.find(x=>x.topic===topic && x.stage===Math.max(1,task.stage-1));
+   if(fallback && !state.trainingQueue.slice(state.trainingIndex+1).includes(fallback.id)) state.trainingQueue.splice(state.trainingIndex+1,0,fallback.id);
+ } else {
+   const recent=state.trainingResults.filter(x=>x.topic===topic).slice(-3);
+   if(recent.length>=2 && recent.every(x=>x.attempts===1 && x.hints===0)){
+     const harder=trainerBank.find(x=>x.topic===topic && x.stage===Math.min(4,task.stage+1));
+     if(harder && !state.trainingQueue.includes(harder.id)) state.trainingQueue.push(harder.id);
+   }
+ }
+}
+
+function diagnosticSummary(){
+ const r=state.diagnosticResults;
+ const topicStats={}; orthograms.forEach(o=>topicStats[o.id]={n:0,score:0});
+ r.forEach(x=>{if(topicStats[x.topic]){topicStats[x.topic].n++;topicStats[x.topic].score+=(x.attempts===1?1:.55)-(x.hints*.1)}});
+ const ranked=Object.entries(topicStats).filter(([,v])=>v.n).map(([k,v])=>({topic:k,score:v.score/v.n})).sort((a,b)=>a.score-b.score);
+ return {weak:ranked[0]?.topic||'prepri', strong:ranked.at(-1)?.topic||'gor', accuracy:r.length?Math.round(r.filter(x=>x.attempts===1).length/r.length*100):0};
+}
+function labelTopic(id){return orthograms.find(o=>o.id===id)?.title||id}
+function renderResult(){
+ const isDiag=state.diagnosticDone && state.trainingResults.length===0;
+ const s=diagnosticSummary();
+ const results=isDiag?state.diagnosticResults:state.trainingResults;
+ const independence=results.length?Math.round(results.filter(x=>x.hints===0).length/results.length*100):0;
+ const self=results.length?Math.round(results.filter(x=>x.attempts>1 && x.ok).length/results.length*100):0;
+ page(`<p class="eyebrow">${isDiag?'Диагностика завершена':'Результат занятия'}</p><h1>${isDiag?'Твой маршрут готов.':'Сегодня навык стал устойчивее.'}</h1>
+ <div class="grid" style="margin-top:26px">${metricCard('Точность с первой попытки',`${results.length?Math.round(results.filter(x=>x.attempts===1).length/results.length*100):0}%`,'не смешиваем с ответами после подсказки','yellow')}${metricCard('Самостоятельность',`${independence}%`,'ответы без подсказок')}${metricCard('Самоисправления',`${self}%`,'ошибка → повторная попытка → верный ответ','blue')}</div>
+ <section class="section"><div class="grid"><article class="card wide"><h3>Твоя сильная сторона</h3><div class="metric" style="font-size:2rem">${labelTopic(s.strong)}</div><p>Здесь можно постепенно убирать опоры и переходить к смешанным заданиям.</p></article><article class="card"><h3>Зона роста</h3><div class="metric" style="font-size:2rem">${labelTopic(s.weak)}</div><p>Система вернёт тебя к тому шагу, где появляется затруднение.</p></article><article class="card full pink"><h3>Сегодня потренируем</h3><p style="font-size:1.15rem;max-width:760px">Сначала — обнаружение и распознавание орфограммы, затем — объяснение алгоритма и перенос в предложение.</p><button class="btn" data-route="trainer">Продолжить тренировку</button></article></div></section>
+ <div class="actions"><button class="btn secondary" data-route="passport">Открыть паспорт зоркости</button><button class="btn secondary" data-route="student">В кабинет ученика</button></div>`);
+}
+
+function renderTrainer(){
+ if(!state.diagnosticDone){navigate('diagnosis');return}
+ const id=state.trainingQueue[state.trainingIndex] || state.trainingQueue[0];
+ const t=trainerBank.find(x=>x.id===id) || trainerBank[0];
+ const pct=Math.round((state.trainingIndex/Math.max(6,state.trainingQueue.length))*100);
+ page(`<section class="task-shell"><p class="eyebrow">Персональная тренировка · ~10 минут</p><div class="task-top"><div><div class="task-type">${t.title} · ${labelTopic(t.topic)}</div><h1>${t.prompt}</h1></div><div style="min-width:190px">${progress('Тренировка',pct)}</div></div>
+ <div class="stage-map"><div class="stage ${t.stage>1?'done':t.stage===1?'current':''}"><b>1 · ЗАМЕЧАЮ</b><small>нахожу опасное место</small></div><div class="stage ${t.stage>2?'done':t.stage===2?'current':''}"><b>2 · РАСПОЗНАЮ</b><small>определяю тип</small></div><div class="stage ${t.stage>3?'done':t.stage===3?'current':''}"><b>3 · ОБЪЯСНЯЮ</b><small>выбираю алгоритм</small></div><div class="stage ${t.stage===4?'current':''}"><b>4 · ПРИМЕНЯЮ</b><small>переношу в контекст</small></div></div>
+ <div class="task-card" id="trainerTask" style="margin-top:18px"></div>
+ <div class="callout"><strong>Почему выбрано это задание?</strong>${adaptiveReason(t)}</div></section>`,'compact');
+ renderTask(t,'trainerTask','training');
+}
+function adaptiveReason(t){if(t.stage===1)return 'В предыдущих действиях важнее укрепить обнаружение орфограммы — система уменьшает сложность не количеством вопросов, а возвращением к нужной операции.';if(t.stage===2)return 'Опасное место уже замечается, но нужно стабилизировать классификацию орфограммы.';if(t.stage===3)return 'Распознавание достаточно устойчиво; сейчас тренируется выбор правила и алгоритма.';return 'Базовые шаги выполнены: пора проверить перенос навыка в самостоятельное редактирование.'}
+
+function calcPassport(){
+ const p={...basePassport};
+ const all=[...state.diagnosticResults,...state.trainingResults];
+ if(all.length){p.detection=Math.min(96,60+all.filter(x=>x.stage===1&&x.attempts===1).length*7);p.recognition=Math.min(94,58+all.filter(x=>x.stage===2&&x.attempts===1).length*8);p.ruleUse=Math.min(95,62+all.filter(x=>x.stage===3&&x.attempts===1).length*7);p.selfCorrection=Math.min(92,52+all.filter(x=>x.attempts>1&&x.ok).length*8);p.transfer=Math.min(90,54+all.filter(x=>x.stage===4&&x.attempts===1).length*9)}
+ return p;
+}
+function renderPassport(){const p=calcPassport();page(`<p class="eyebrow">Паспорт орфографической зоркости</p><h1>Не «7 из 10». А профиль действий.</h1><div class="grid" style="margin-top:28px"><article class="card wide"><h3>Пять наблюдаемых компонентов</h3>${skill('Обнаружение орфограмм',p.detection)}${skill('Распознавание типа',p.recognition)}${skill('Применение правила',p.ruleUse)}${skill('Самоисправление',p.selfCorrection)}${skill('Перенос в текст',p.transfer)}</article><article class="card yellow"><h3>Серия занятий</h3><div class="metric">${p.streak}</div><p>регулярных тренировок</p><p><strong>${p.speed}</strong><br><span class="micro">средняя скорость</span></p></article><article class="card"><h3>Сейчас тренируем</h3><div class="kicker-row">${p.training.map(x=>`<span class="pill blue">${x}</span>`).join('')}</div><h3 style="margin-top:20px">Освоено</h3><div class="kicker-row">${p.mastered.map(x=>`<span class="pill yellow">✓ ${x}</span>`).join('')}</div></article><article class="card wide"><h3>Повторяющиеся паттерны</h3><p>• ${p.recurrent[0]}</p><p>• ${p.recurrent[1]}</p><div class="callout"><strong>Следующее педагогическое действие</strong>Дать короткий блок на смысловые группы ПРИ-, затем вернуть слова с СВЕРХ- в смешанное задание через 2 занятия.</div></article></div><div class="actions"><button class="btn blue" data-route="trainer">Продолжить тренировку</button><button class="btn secondary" data-route="student">К кабинету ученика</button></div>`)}
+function skill(name,val){return `<div class="skill-row"><b>${name}</b><div class="progress"><span style="width:${val}%"></span></div><div class="score">${val}%</div></div>`}
+
+function renderStudent(){const p=calcPassport();page(`<p class="eyebrow">Кабинет ученика · демо</p><h1>Привет, Илья.</h1><div class="grid" style="margin-top:28px"><article class="card wide blue"><h3>Тренировка на сегодня</h3><div class="metric" style="font-size:2.2rem">ПРЕ-/ПРИ- + повторение Ы/И</div><p>7 заданий · примерно 11 минут</p>${progress('Сегодня',43)}<button class="btn yellow" data-route="trainer" style="margin-top:20px">Продолжить</button></article><article class="card"><h3>Моя орфографическая зоркость</h3><div class="metric">${Math.round((p.detection+p.recognition+p.ruleUse+p.transfer)/4)}%</div><p>индекс для навигации по прогрессу, не школьная отметка</p><button class="btn secondary small" data-route="passport">Открыть паспорт</button></article><article class="card"><h3>Повторение</h3><p><strong>ГОР-/ГАР-</strong><br><span class="micro">вернём сегодня в смешанном контексте</span></p><div class="pill yellow">через 2 задания</div></article><article class="card"><h3>Новое</h3><p><strong>Соединительные О/Е</strong></p><div class="pill">после повторения</div></article><article class="card wide"><h3>Динамика</h3>${sparkline([48,53,57,61,64,69,73,76])}<p class="micro">Демо-данные: индекс освоения растёт, но система отдельно хранит самостоятельность, подсказки и перенос.</p></article><article class="card yellow"><h3>Личное достижение</h3><div class="metric" style="font-size:1.85rem">Исправляю себя самостоятельно</div><p>3 самоисправления за последние 2 занятия</p></article></div>`)}
+function sparkline(vals){const pts=vals.map((v,i)=>`${20+i*(560/(vals.length-1))},${130-(v-40)*2}`).join(' ');return `<svg class="sparkline" viewBox="0 0 600 150" role="img" aria-label="График динамики"><line class="chart-axis" x1="20" y1="130" x2="580" y2="130"></line><polyline class="chart-line" points="${pts}"></polyline>${vals.map((v,i)=>`<circle class="chart-dot" cx="${20+i*(560/(vals.length-1))}" cy="${130-(v-40)*2}" r="6"></circle>`).join('')}</svg>`}
+
+function renderTeacher(){page(`<p class="eyebrow">Кабинет учителя · демо</p><h1>6Б: где нужна педагогическая поддержка?</h1><div class="subnav"><button data-route="class">Класс</button><button data-route="creator">Создать тренажёр</button><button data-route="research">Исследование</button><button data-route="method">Методическая база</button></div><div class="grid">${metricCard('Выполнение','83%','ученики завершили тренировку недели','yellow')}${metricCard('Положительная динамика','+7%','медианная динамика за 4 недели')}${metricCard('Нужна доп. тренировка','4','из 28 учеников','pink')}<article class="card wide"><h3>Проблемные орфограммы класса</h3><div class="barset">${barrow('ПРЕ-/ПРИ-',68)}${barrow('Ы/И после приставок',61)}${barrow('КОС-/КАС-',54)}${barrow('Соединительные О/Е',38)}</div></article><article class="card"><h3>Типичные затруднения</h3><p><strong>31%</strong> — не классифицируют тип</p><p><strong>24%</strong> — знают правило, но ошибаются в применении</p><p><strong>18%</strong> — пропускают опасное место</p></article><article class="card full blue"><h3>Рекомендация системы</h3><p style="font-size:1.2rem;max-width:880px">Для 4 учеников начать с обнаружения и классификации ПРЕ-/ПРИ-. Для класса в целом — короткое смешанное повторение Ы/И после приставок. Учитель может изменить это решение.</p><button class="btn yellow" data-route="creator">Настроить вручную</button></article></div>`)}
+function barrow(name,v){return `<div class="barrow"><span>${name}</span><div class="bar"><span style="width:${v}%"></span></div><strong>${v}%</strong></div>`}
+
+function renderClass(){page(`<p class="eyebrow">Страница класса · 6Б · демо</p><h1>Класс целиком — и каждый профиль отдельно.</h1><div class="actions"><button class="btn blue" data-route="creator">Назначить тему</button><button class="btn secondary" data-route="teacher">Назад к обзору</button></div><div class="table-wrap" style="margin-top:24px"><table class="data-table"><thead><tr><th>Ученик</th><th>Выполнение</th><th>Динамика</th><th>Зона риска</th><th>Подсказки</th><th>Действие</th></tr></thead><tbody>${demoStudents.map(s=>`<tr><td><strong>${s.name}</strong></td><td>${s.completion}%</td><td>${s.trend>=0?'+':''}${s.trend}%</td><td>${s.risk}</td><td>${s.hints}</td><td><button data-student="${s.id}">Профиль →</button></td></tr>`).join('')}</tbody></table></div><div class="callout"><strong>Важно</strong>Демо показывает обезличенные результаты. В исследовательском режиме персональные данные не нужны: сравнение строится по кодам и агрегированным показателям.</div>`);$$('[data-student]').forEach(b=>b.addEventListener('click',()=>{state.lastStudentId=b.dataset.student;save();navigate('studentprofile')}))}
+
+function renderStudentProfile(){const s=demoStudents.find(x=>x.id===state.lastStudentId)||demoStudents[3];page(`<p class="eyebrow">Профиль ученика · демо</p><h1>${s.name}</h1><div class="grid" style="margin-top:28px">${metricCard('Тренировок',s.sessions,'за текущий цикл','yellow')}${metricCard('Подсказки',s.hints,'использованы за цикл')}${metricCard('Динамика',`${s.trend>=0?'+':''}${s.trend}%`,'по сопоставимым заданиям','blue')}<article class="card wide"><h3>Карта затруднений</h3><div class="barset">${barrow('Обнаружение',72)}${barrow('Классификация',58)}${barrow('Применение правила',66)}${barrow('Перенос в текст',49)}</div></article><article class="card"><h3>Частые ошибки</h3><div class="kicker-row"><span class="pill pink">${s.risk}</span><span class="pill">2+ попытки</span><span class="pill">подсказка 2</span></div><p>Система различает повторяющийся паттерн и разовую ошибку по серии сопоставимых заданий.</p></article><article class="card full yellow"><h3>Рекомендация системы</h3><p style="font-size:1.15rem">Следующую тренировку начать с уровня «РАСПОЗНАЮ», затем дать 2 задания «ОБЪЯСНЯЮ». После двух самостоятельных успехов — перенос в короткий текст.</p><div class="actions"><button class="btn" data-route="creator">Создать персональный тренажёр</button><button class="btn secondary" data-route="class">Вернуться к классу</button></div></article></div>`)}
+
+function renderCreator(){page(`<p class="eyebrow">Учительский режим</p><h1>Создать персональный тренажёр</h1><div class="grid" style="margin-top:28px"><article class="card wide"><div class="form-grid"><div class="field"><label>Класс</label><select id="cClass"><option>6Б</option><option>6А</option><option>5В</option></select></div><div class="field"><label>Ученик / группа</label><select id="cStudent"><option>Илья Р.</option><option>4 ученика с зоной риска</option><option>Весь класс</option></select></div><div class="field"><label>Орфограмма</label><select id="cTopic">${orthograms.map(o=>`<option value="${o.id}">${o.title}</option>`).join('')}</select></div><div class="field"><label>Этап</label><select id="cStage"><option value="1">1 · Замечаю</option><option value="2">2 · Распознаю</option><option value="3" selected>3 · Объясняю</option><option value="4">4 · Применяю</option></select></div><div class="field"><label>Количество</label><select id="cCount"><option>5</option><option selected>7</option><option>10</option></select></div><div class="field"><label>Сложность</label><select id="cDifficulty"><option>поддерживающая</option><option selected>базовая</option><option>повышенная</option></select></div><div class="field"><label>Тип упражнения</label><select id="cType"><option>автоматически</option><option>найди опасное место</option><option>выбери алгоритм</option><option>редактор</option><option>смешанный вызов</option></select></div></div><div class="actions"><button class="btn blue" id="generateBtn">Сформировать вариант</button></div><div id="creatorPreview"></div></article><article class="card pink"><h3>Контроль учителя</h3><p>ИИ не публикует задание автоматически. Он предлагает вариант из утверждённых правил и шаблонов.</p><p><strong>Перед назначением:</strong> изменить формулировку, заменить пример, удалить задание, добавить своё, сгенерировать новый вариант.</p></article></div>`);$('#generateBtn').addEventListener('click',generatePreview)}
+function generatePreview(){const topic=$('#cTopic').value,stage=+$('#cStage').value;let pool=trainerBank.filter(x=>x.topic===topic&&Math.abs(x.stage-stage)<=1);if(pool.length<3)pool=[...pool,...trainerBank.filter(x=>x.topic===topic)];const chosen=pool.slice(0,3);$('#creatorPreview').innerHTML=`<div class="preview"><div class="tag">Предварительный просмотр · шаблонная генерация</div>${chosen.map((t,i)=>`<div class="preview-item"><strong>${i+1}. ${t.title}</strong><br>${t.prompt}<div class="actions" style="margin-top:8px"><button class="btn secondary small" type="button">Изменить</button><button class="btn secondary small" type="button">Заменить пример</button><button class="btn secondary small" type="button">Удалить</button></div></div>`).join('')}<label class="checkline" style="margin-top:16px"><input type="checkbox" id="teacherCheck"> <span><strong>Проверено учителем.</strong> Правила, ответы и формулировки просмотрены.</span></label><button class="btn blue" id="publishBtn" disabled style="margin-top:15px">Назначить тренажёр</button></div>`;$('#teacherCheck').addEventListener('change',e=>$('#publishBtn').disabled=!e.target.checked);$('#publishBtn').addEventListener('click',()=>showToast('Демо: тренажёр назначен.'))}
+
+function renderLibrary(){page(`<p class="eyebrow">Библиотека орфограмм</p><h1>Правило → операция → упражнение</h1><p class="section-intro">Демонстрационная база использует только правила, взятые из загруженных пособий. ИИ здесь не является источником нормы.</p><div class="library-list" style="margin-top:28px">${orthograms.map(o=>`<article class="orth-item"><div class="orth-head"><div><strong>${o.title}</strong><div class="micro">${o.examples.join(' · ')}</div></div><button aria-label="Раскрыть ${o.title}">＋</button></div><div class="orth-body"><p><strong>Правило.</strong> ${o.rule}</p><p><strong>Формируемые операции:</strong> ${o.skills.join(' → ')}.</p><p class="rule-source">Основа демо: ${o.source}.</p></div></article>`).join('')}</div>`);$$('.orth-head').forEach(h=>h.addEventListener('click',()=>{const item=h.parentElement;item.classList.toggle('open');$('button',h).textContent=item.classList.contains('open')?'−':'＋'}))}
+
+function renderResearch(){page(`<p class="eyebrow">Исследовательская аналитика · демо</p><h1>Сравниваем навыки, а не фамилии.</h1><div class="grid" style="margin-top:28px"><article class="card full"><h3>Динамика трёх диагностик</h3><div class="barset">${compareRow('Замечает орфограмму',54,68,79)}${compareRow('Самостоятельные исправления',22,39,57)}${compareRow('Перенос в текст',41,52,66)}${compareRow('Зависимость от подсказок ↓',62,44,29)}</div></article>${metricCard('Начальная','54%','обнаружение опасных мест','yellow')}${metricCard('Промежуточная','68%','сопоставимый показатель')}${metricCard('Итоговая','79%','сопоставимый показатель','blue')}<article class="card full"><h3>Экспорт обезличенной статистики</h3><p>CSV включает код ученика, диагностический срез, орфограмму, этап навыка, правильность, попытки, время, подсказки, самоисправление и показатель переноса.</p><button class="btn secondary" id="exportCsv">Экспорт CSV</button></article></div>`);$('#exportCsv').addEventListener('click',exportResearchCsv)}
+function compareRow(name,a,b,c){return `<div><strong>${name}</strong><div class="kicker-row"><span class="pill">старт ${a}%</span><span class="pill yellow">середина ${b}%</span><span class="pill blue">итог ${c}%</span></div></div>`}
+function exportResearchCsv(){const rows=[['student_code','slice','orthogram','stage','correct','attempts','hints','time_sec','self_corrected','transfer'],['S-014','start','prepri','2','0','2','1','34','1','0'],['S-014','mid','prepri','3','1','1','0','25','0','0'],['S-014','final','prepri','4','1','1','0','21','0','1']];const blob=new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='orfozor_research_demo.csv';a.click();URL.revokeObjectURL(a.href);showToast('CSV экспортирован.')}
+
+function renderMethod(){page(`<p class="eyebrow">Методическая база</p><h1>Что взято из источников — и что является технологическим решением.</h1><section class="section"><div class="grid"><article class="card wide"><h3>Из загруженных пособий</h3><p>В демо сохранена логика школьной орфографической работы: выделить морфему/опасную позицию, вставить букву, обосновать выбор, классифицировать примеры, исправить ошибки, подготовиться к диктанту, составить предложения и работать со смешанными тестами.</p><p>Правила по КОС-/КАС-, ГОР-/ГАР-, Ы/И после приставок, ПРЕ-/ПРИ- и соединительным О/Е сформулированы по пособию Узорова—Нефёдова. Вариативность механик и работа в контексте поддержаны упражнениями рабочей тетради Ларионовой.</p><div class="callout"><strong>Что источники не дают.</strong>В предоставленных пособиях не найдено отдельного определения термина «орфографическая зоркость», теоретической модели её компонентов или этапов формирования навыка. Поэтому прототип не приписывает авторам такие положения: четырёхступенчатая модель ниже взята из проектного ТЗ и явно отделена от источников.</div></article><article class="card blue"><h3>Технологическое решение ОрфоЗора</h3><p>Диагностика по этапам действия, «паспорт зоркости», выбор следующего задания по типу ошибки, распределённое возвращение темы и составной mastery score — это проектная модель прототипа, а не цитата из пособий.</p></article></div></section><section class="section"><div class="section-head"><div><p class="eyebrow">Адаптация</p><h2>Ошибка меняет следующий шаг.</h2></div></div><div class="flow"><div class="flow-step"><b>Не заметил</b>Задание на поиск опасного места.</div><div class="flow-step"><b>Не распознал</b>Сравнение и классификация.</div><div class="flow-step"><b>Сбился в правиле</b>Пошаговый алгоритм.</div><div class="flow-step"><b>Справился</b>Предложение или текст.</div><div class="flow-step"><b>Навык стабилен</b>Отложенное смешанное повторение.</div></div></section><section class="section"><h2>Mastery score · прототип</h2><div class="callout"><strong>Формула не выдаётся за научную норму.</strong>В прототипе итоговый индекс использует: точность 30%, самостоятельность 20%, первая попытка 15%, стабильность 15%, отложенное повторение 10%, перенос в новый контекст 10%. В рабочем исследовании веса следует валидировать.</div></section><section class="section"><h2>Wireframe ключевых экранов</h2><div class="grid"><article class="card"><h3>Ученик</h3>${wireframe()}</article><article class="card"><h3>Тренажёр</h3>${wireframe()}</article><article class="card"><h3>Учитель</h3>${wireframe()}</article></div></section>`)}
+function wireframe(){return `<div class="wireframe"><div class="wf-top"></div><div class="wf-row"><div class="wf-big"></div><div class="wf-small"></div></div><div class="wf-cards"><span></span><span></span><span></span></div></div>`}
+
+function renderAbout(){page(`<p class="eyebrow">О проекте</p><h1>ИИ помогает персонализировать работу учителя — не заменять её.</h1><div class="grid" style="margin-top:28px"><article class="card wide"><h3>Назначение</h3><p style="font-size:1.25rem">Персонализированный интеллектуальный тренажёр формирования орфографической зоркости обучающихся 5–6 классов.</p><p>Центральная идея: фиксировать не только «правильно / неправильно», а структуру действия — заметил ли ученик орфограмму, распознал ли тип, выбрал ли алгоритм, смог ли объяснить и перенести навык.</p></article><article class="card yellow"><h3>Принцип безопасности</h3><p>Непроверенные ИИ-задания не должны автоматически попадать ученику. Учитель сохраняет право изменить любой маршрут и любой сгенерированный вариант.</p></article><article class="card"><h3>Мобильность</h3><p>Крупные интерактивные зоны, нажатие прямо на букву, высокий контраст, клавиатурная навигация.</p></article><article class="card"><h3>Доступность</h3><p>Правильность обозначается не только цветом: используются значок, текстовая обратная связь и структурное изменение элемента.</p></article><article class="card blue"><h3>Данные</h3><p>Демо-ученики вымышлены. Исследовательский экспорт — обезличенный.</p></article></div><div class="actions"><button class="btn blue" data-route="diagnosis">Попробовать диагностику</button><button class="btn secondary" onclick="resetDemo()">Сбросить демо-данные</button></div>`)}
+
+route();
