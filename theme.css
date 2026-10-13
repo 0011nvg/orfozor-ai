@@ -270,3 +270,109 @@ h1,h2,h3,.metric{font-family:Literata,Georgia,serif}
   .orth-head{padding:17px 16px 17px 20px}.orth-head strong{font-size:1.04rem}.orth-body{padding:14px 17px 20px}
 }
 @media(prefers-reduced-motion: reduce){.entry-card,.btn{transition:none!important}}
+
+
+/* --- Refinement: newspaper cutout patchwork + playful student lab --- */
+.hero-collage{overflow:visible}
+.newspaper-collage::before{background:linear-gradient(180deg,#eadccd 0%,#e7d6c5 100%)}
+.newspaper-collage::after{background:repeating-linear-gradient(0deg,rgba(134,111,94,.045) 0 1px,transparent 1px 24px);mix-blend-mode:multiply;border:1px dashed #AA8F7B}
+.patch-cut{flex-direction:column;background:#fffaf2;color:#2F2C29;clip-path:polygon(2% 0,100% 4%,97% 100%,0 96%);padding:10px 12px}
+.patch-cut::before{content:"";position:absolute;inset:7px;border:1px dashed rgba(84,70,58,.18);pointer-events:none}
+.patch-cut span{font-family:"Golos Text",system-ui,sans-serif;font-weight:800;letter-spacing:.08em;font-size:clamp(1.55rem,3.8vw,2.75rem);line-height:1}
+.patch-cut small{margin-top:7px;font:700 .52rem/1.2 "Golos Text",sans-serif;letter-spacing:.19em;text-transform:uppercase;color:#7E6859}
+.patch-cut-1{top:1%;left:2%;width:30%;height:18%;transform:rotate(-8deg);background:#F6E1A8}
+.patch-cut-2{top:4%;left:31%;width:22%;height:16%;transform:rotate(5deg);background:#E7D6F0}
+.patch-cut-3{top:2%;right:0;width:29%;height:18%;transform:rotate(-3deg);background:#D8E2D1}
+.patch-cut-4{left:2%;bottom:15%;width:24%;height:18%;transform:rotate(-6deg);background:#F1D2C8}
+.patch-cut-5{right:4%;bottom:16%;width:24%;height:18%;transform:rotate(6deg);background:#D3DEE8}
+.patch-thread{top:18%;right:6%;width:17%;height:17%;background:#d7b7a8;transform:rotate(8deg)}
+.patch-thread i{width:50px;height:50px;border-width:10px;box-shadow:0 0 0 1px rgba(96,61,47,.18),0 0 0 15px rgba(255,241,213,.24)}
+.patch-band{right:11%;bottom:0;height:15%;width:61%;background:#B5BFAA;background-image:repeating-linear-gradient(90deg,transparent 0 27px,rgba(47,68,55,.16) 27px 28px);font:650 1rem/1.15 Literata,serif;letter-spacing:.02em;text-align:center;transform:rotate(4deg);color:#334437;padding:15px 18px}
+.patch-corner{bottom:3%;left:26%;width:15%;height:11%;background:#5D6E8A;color:#F7EAD8;transform:rotate(8deg)}
+.patch-corner span{font:700 2.2rem/1 Literata,Georgia,serif;letter-spacing:-.08em}
+.hero-collage .hero-demo{top:28%;left:12%;width:76%;transform:rotate(-1.5deg)}
+.entry-card{background-image:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0));}
+.entry-card::after{content:"";position:absolute;top:10px;right:14px;width:44px;height:14px;background:rgba(255,251,240,.55);border:1px solid rgba(113,93,79,.18);transform:rotate(7deg);z-index:0}
+.entry-card:nth-child(2)::after{left:14px;right:auto;transform:rotate(-7deg)}
+.entry-card:nth-child(3)::after{top:auto;bottom:12px;transform:rotate(-4deg)}
+.entry-card:nth-child(4)::after{left:14px;right:auto;top:auto;bottom:12px;transform:rotate(8deg)}
+.entry-card strong,.entry-card>span,.entry-num,.entry-arrow{position:relative;z-index:1}
+.kids-section{margin-top:56px}
+.game-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:8px}
+.game-card{position:relative;background:#fffbf5;border:1px solid #d4c5b2;box-shadow:4px 6px 0 rgba(71,55,41,.07);padding:22px 20px 18px;border-radius:3px;overflow:hidden}
+.game-card::before{content:"";position:absolute;inset:9px;border:1px dashed rgba(88,70,57,.16);pointer-events:none}
+.game-card::after{content:"";position:absolute;top:14px;right:18px;width:52px;height:16px;background:rgba(255,250,241,.72);border:1px solid rgba(120,102,87,.18);transform:rotate(7deg)}
+.game-card h3{position:relative;z-index:1;margin:16px 0 10px;font:600 1.35rem/1.25 Literata,Georgia,serif;letter-spacing:-.03em}
+.game-card p{position:relative;z-index:1;margin:0;color:#5f554e;line-height:1.6}
+.game-icon{position:relative;z-index:1;width:62px;height:62px;border-radius:16px;display:grid;place-items:center;font-size:1.9rem;background:rgba(255,255,255,.58);border:1px solid rgba(88,72,59,.12)}
+.game-sticker{position:relative;z-index:1;display:inline-block;padding:6px 10px;font-size:.58rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;border-radius:999px;background:#f6ecda;border:1px solid rgba(88,72,59,.13);color:#7A6559}
+.game-meta{position:relative;z-index:1;display:flex;gap:8px;flex-wrap:wrap;margin:15px 0 16px}
+.game-card .btn{position:relative;z-index:1}
+.game-card-hunt{background:#eef2f2}
+.game-card-editor{background:#f6e8df}
+.game-card-build{background:#f5edd8}
+.game-card-detective{background:#e7e1ea}
+.clip-note{margin-top:18px;background:#fff8ee;border:1px solid #d7c8b8;box-shadow:3px 4px 0 rgba(71,55,41,.05);padding:16px 18px 16px 20px;position:relative}
+.clip-note::before{content:"МЕТОДИЧЕСКАЯ ПОМЕТА";display:block;margin-bottom:8px;font:.6rem/1 "Golos Text",sans-serif;font-weight:800;letter-spacing:.18em;color:#8D6E63}
+@media(max-width:960px){
+  .patch-cut span{font-size:clamp(1.3rem,3vw,2.15rem)}
+  .patch-band{width:66%;right:7%}
+  .game-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:620px){
+  .patch-cut span{font-size:1.35rem}
+  .patch-cut small{font-size:.45rem;letter-spacing:.12em}
+  .patch-cut-1,.patch-cut-2,.patch-cut-3,.patch-cut-4,.patch-cut-5{width:26%;height:14%}
+  .patch-cut-1{left:1%;top:1%}
+  .patch-cut-2{left:27%;top:4%}
+  .patch-cut-3{right:2%;top:2%;width:32%}
+  .patch-cut-4{left:1%;bottom:14%}
+  .patch-cut-5{right:3%;bottom:15%}
+  .patch-band{width:73%;right:4%;bottom:1%;font-size:.73rem;padding:10px 11px}
+  .patch-corner{left:30%;width:18%}
+  .game-grid{grid-template-columns:1fr}
+}
+
+/* Игровая лаборатория — журнальные полосы с реальными действиями */
+.game-menu{margin-top:30px}
+.game-menu .game-card{display:flex;flex-direction:column;min-height:225px}
+.game-menu .game-card h3{margin:24px 0 10px}
+.game-menu .game-card .btn{margin-top:auto;align-self:flex-start}
+.game-play{max-width:1020px;margin:0 auto}
+.game-play-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:start;border-top:1px solid var(--line);padding-top:22px;margin-top:18px}
+.game-play-head h1{font-family:Literata,Georgia,serif;font-weight:650;letter-spacing:-.05em;line-height:1.15}
+.game-play-head p{color:var(--muted);max-width:580px;font-size:1rem;margin:12px 0 0}
+.game-page-index{font:750 .9rem/1.5 "Golos Text",sans-serif;background:#F0D6B2;border:1px solid #C8A980;color:#4B3A34;padding:8px 12px;white-space:nowrap}
+.game-play-card{position:relative;min-height:390px;margin-top:26px;background:#FFFCF6;border:1px solid #CDBAA4;box-shadow:8px 10px 0 #DCC7B2,0 22px 46px rgba(61,41,35,.09);padding:clamp(22px,4vw,46px);isolation:isolate}
+.game-play-card::after{content:"";position:absolute;z-index:-1;right:26px;top:-18px;width:91px;height:26px;background:rgba(196,159,128,.35);border:1px solid rgba(113,80,54,.14);transform:rotate(5deg)}
+.game-edition{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:#935C68;border-bottom:1px solid #D9CABA;padding:0 0 16px;margin-bottom:25px;font-weight:800}
+.game-play-card h2{font:600 clamp(1.35rem,3vw,2.2rem)/1.35 Literata,Georgia,serif;color:var(--navy);letter-spacing:-.035em;max-width:740px;margin:0 0 26px}
+.game-word-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.game-choice-list{display:grid;gap:10px}
+.game-choice-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.game-option{border:1.5px solid #B8A68E;background:#F6EAD8;border-radius:5px;min-height:48px;text-align:left;padding:12px 18px;font-weight:700;color:#343943;transition:transform .16s ease,background .16s ease,border-color .16s ease}
+.game-option:hover:not(:disabled){background:#EDDAB8;transform:translateY(-2px)}
+.game-option.selected{background:#33425B;color:#fff;border-color:#33425B;box-shadow:0 4px 0 rgba(40,52,74,.12)}
+.game-option:disabled{opacity:.82;cursor:default}
+.game-word{font:600 clamp(1rem,2vw,1.25rem)/1.2 Literata,Georgia,serif}
+.game-assembly{margin:20px 0 26px;display:flex;justify-content:center;align-items:center;gap:0}
+.game-assembly span{min-width:60px;padding:18px 8px;text-align:center;font:600 clamp(1.8rem,4.3vw,3.5rem)/1.1 Literata,Georgia,serif;color:var(--navy);border-bottom:2px solid #D0B392}
+.game-assembly #gamePlace{color:var(--berry);background:#F0E0DD;border-bottom-color:var(--berry)}
+.game-newspaper{background:#EDE1D2;border-top:3px double #766A5D;border-bottom:3px double #766A5D;color:#38322F;margin:8px 0 26px;padding:21px 25px;font:550 clamp(1.1rem,2.5vw,1.7rem)/1.55 Literata,Georgia,serif}
+.game-edit-label{font-weight:750;display:block;margin-bottom:8px}
+.game-play-card #gameEdit{max-width:480px;width:100%}
+.game-result{display:none;margin-top:22px}
+.game-controls{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:28px}
+.game-complete{background:#FAF0E2;border:1px solid #D2BEA9;padding:30px;max-width:640px;margin-top:25px}
+.game-metric{font:700 4rem/1 Literata,Georgia,serif;color:var(--berry);letter-spacing:-.08em}
+.game-complete p{max-width:490px;margin:12px 0;color:#5A5046}
+.game-card .game-icon{font:800 1.45rem/1 "Golos Text",sans-serif;letter-spacing:-.04em}
+@media(max-width:620px){
+ .game-play-head{grid-template-columns:1fr}
+ .game-page-index{justify-self:start}
+ .game-play-card{margin-top:18px;padding:20px 15px;box-shadow:4px 5px 0 #DCC7B2}
+ .game-word-row{gap:7px}.game-option{padding:10px 12px;min-height:45px}
+ .game-controls{flex-wrap:wrap;justify-content:stretch}
+ .game-controls .btn{flex:1 1 160px}
+ .game-assembly span{min-width:40px}
+}
