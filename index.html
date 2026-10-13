@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#F7F4ED" />
+  <meta name="description" content="ОрфоЗор AI — демонстрационный адаптивный тренажёр орфографической зоркости для 5–6 классов." />
+  <title>ОрфоЗор AI — адаптивный тренажёр орфографической зоркости</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">К содержанию</a>
+  <header class="topbar">
+    <button class="brand" data-route="home" aria-label="ОрфоЗор AI — на главную">
+      <span class="brand-word">ОРФОЗОР</span><span class="brand-ai">AI</span>
+    </button>
+    <div class="demo-chip" aria-label="Демонстрационная версия">ДЕМО · обезличенные данные</div>
+    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="mainNav">Меню</button>
+    <nav class="main-nav" id="mainNav" aria-label="Основная навигация">
+      <button data-route="student">Ученику</button>
+      <button data-route="teacher">Учителю</button>
+      <button data-route="library">Орфограммы</button>
+      <button data-route="method">Методика</button>
+      <button data-route="about">О проекте</button>
+    </nav>
+  </header>
+
+  <main id="main" tabindex="-1"></main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
