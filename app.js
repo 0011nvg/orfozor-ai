@@ -133,54 +133,54 @@ function progress(label,value){return `<div class="progress-label"><span>${label
 
 function renderHome(){
  page(`
-  <section class="hero literary-hero" aria-labelledby="orfo-title">
-    <div class="hero-story">
-      <div class="edition-line"><span class="edition-mark">ОРФОГРАФИЯ / НОВЫЙ ВЗГЛЯД</span><span class="edition-issue">5–6 классы · выпуск 01</span></div>
-      <p class="eyebrow hero-overline">Образовательная лаборатория</p>
-      <h1 id="orfo-title">Орфо<span>Зор</span><sup>AI</sup></h1>
-      <p class="hero-literary-title">Лаборатория<br><em>русского слова</em><span class="title-asterisk" aria-hidden="true">✳</span></p>
-      <p class="hero-copy">У каждого слова есть своя история. <strong>Учись замечать место, где может появиться ошибка.</strong> Разбирайся в правилах, находи орфограммы и наблюдай, как растёт твоя грамотность.</p>
-      <div class="hero-actions"><button class="btn blue" data-route="diagnosis">Начать диагностику <span aria-hidden="true">↗</span></button><button class="btn secondary" data-route="teacher">Кабинет учителя <span aria-hidden="true">→</span></button></div>
-      <div class="hero-colophon"><span class="colophon-spark" aria-hidden="true">✦</span><span>ЗАМЕЧАЮ&nbsp; → &nbsp;РАСПОЗНАЮ&nbsp; → &nbsp;ОБЪЯСНЯЮ&nbsp; → &nbsp;ПРИМЕНЯЮ</span></div>
-    </div>
-    <div class="hero-collage newspaper-collage">
-      <div class="patch patch-cut patch-cut-1" aria-hidden="true"><span>РУ</span><small>буква</small></div>
-      <div class="patch patch-cut patch-cut-2" aria-hidden="true"><span>СС</span><small>слово</small></div>
-      <div class="patch patch-cut patch-cut-3" aria-hidden="true"><span>КИЙ</span><small>правило</small></div>
-      <div class="patch patch-thread" aria-hidden="true"><i></i></div>
-      <div class="patch patch-cut patch-cut-4" aria-hidden="true"><span>ЯЗ</span><small>язык</small></div>
-      <div class="patch patch-cut patch-cut-5" aria-hidden="true"><span>ЫК</span><small>смысл</small></div>
-      <div class="patch patch-band" aria-hidden="true">РУССКИЙ ЯЗЫК · БУКВА · СМЫСЛ · ТЕКСТ</div>
-      <div class="hero-demo" aria-label="Интерактивный пример">
-        <div class="demo-label"><span>Проба пера · № 01</span><span>1 действие</span></div>
-        <p class="word-prompt">Где здесь прячется орфограмма?</p>
-        <div class="word-stage"><div class="big-word" id="heroWord" aria-label="Слово прикасаться"></div></div>
-        <div id="heroFeedback" class="feedback" aria-live="polite"></div>
-        <p class="micro">Нажми на букву, написание которой нужно проверить по правилу.</p>
-      </div>
-      <div class="patch patch-corner" aria-hidden="true"><span>РЯ</span></div>
-    </div>
-  </section>
-  <section class="section entry-section" aria-labelledby="entry-heading">
-    <div class="section-head"><div><p class="eyebrow">Открой свою страницу</p><h2 id="entry-heading">С чего начнём?</h2></div><p class="section-intro">Для ученика — внимательная практика. Для учителя — инструменты для занятий, диагностики и печатных работ.</p></div>
-    <div class="entry-grid">
-      <button class="entry-card entry-learner" data-route="student"><span class="entry-num">01 / ИССЛЕДУЙ</span><span class="entry-glyph" aria-hidden="true">Аа</span><strong>Я ученик</strong><span>Тренировки и личный прогресс</span><span class="entry-arrow" aria-hidden="true">↗</span></button>
-      <button class="entry-card entry-teacher" data-route="teacher"><span class="entry-num">02 / НАСТРАИВАЙ</span><span class="entry-glyph" aria-hidden="true">§</span><strong>Я учитель</strong><span>Класс, анализ и задания</span><span class="entry-arrow" aria-hidden="true">↗</span></button>
-      <button class="entry-card entry-print" data-route="worksheet"><span class="entry-num">03 / СОБИРАЙ</span><span class="entry-glyph" aria-hidden="true">№</span><strong>Печатная мастерская</strong><span>Создай авторские варианты работ</span><span class="entry-arrow" aria-hidden="true">↗</span></button>
-      <button class="entry-card entry-library" data-route="library"><span class="entry-num">04 / ОТКРЫВАЙ</span><span class="entry-glyph" aria-hidden="true">ё</span><strong>Библиотека орфограмм</strong><span>Правила, примеры и практика</span><span class="entry-arrow" aria-hidden="true">↗</span></button>
-    </div>
-  </section>
-  <section class="section method-section" aria-labelledby="method-heading">
-    <div class="section-head"><div><p class="eyebrow">Методика в действии</p><h2 id="method-heading">Внимание к букве.<br><em>Понимание слова.</em></h2></div><p class="section-intro">Каждый ответ меняет следующее педагогическое действие: усиливает опору, возвращает к распознаванию или переводит навык в предложение и текст.</p></div>
-    <div class="flow"><div class="flow-step"><b>01 Диагностика</b>Проверяем не только букву, но и умение заметить орфограмму.</div><div class="flow-step"><b>02 Анализ</b>Определяем этап, где возникло затруднение.</div><div class="flow-step"><b>03 Тренировка</b>Подбираем механику под конкретную операцию.</div><div class="flow-step"><b>04 Повторение</b>Возвращаем тему позже и в новом контексте.</div><div class="flow-step"><b>05 Динамика</b>Показываем рост по навыкам, а не только «баллы».</div></div>
-  </section>
-  <section class="section"><div class="grid">
-    ${metricCard('Главный фокус','ЗАМЕЧАТЬ','опасное место до выбора буквы','yellow')}
-    ${metricCard('4 ступени','1 → 4','замечаю · распознаю · объясняю · применяю')}
-    ${metricCard('Роль ИИ','АДАПТАЦИЯ','не источник правил; учитель может изменить решение','blue')}
-  </div></section>
+   <section class="hero literary-hero reference-hero" aria-labelledby="orfo-title">
+     <div class="hero-story">
+       <div class="edition-line"><span>ОРФОЗОР AI / ЛИТЕРАТУРНАЯ МАСТЕРСКАЯ</span><span class="edition-issue">5–6 классы · выпуск 01</span></div>
+       <p class="marginal-note">Замечать.<br>Понимать.<br>Писать уверенно. <span aria-hidden="true">♡</span></p>
+       <p class="eyebrow hero-overline">Русский язык — это больше, чем правила</p>
+       <h1 id="orfo-title">Лаборатория<br><span>русского</span><br>слова</h1>
+       <p class="hero-lead">Развиваем орфографическую зоркость у учеников 5–6 классов.</p>
+       <p class="hero-copy">Замечаем орфограммы, понимаем закономерности, разбираем слова и учимся писать грамотно — шаг за шагом.</p>
+       <div class="hero-actions"><button class="btn blue" data-route="diagnosis">Начать диагностику <span aria-hidden="true">↗</span></button><button class="btn secondary" data-route="library">Открыть библиотеку <span aria-hidden="true">→</span></button></div>
+       <div class="hero-colophon"><span aria-hidden="true">✧</span><span>ЗАМЕЧАЮ · РАСПОЗНАЮ · ОБЪЯСНЯЮ · ПРИМЕНЯЮ</span></div>
+     </div>
+     <div class="hero-collage reference-collage" aria-label="Журнальный коллаж с буквами «Русский язык», книгами, тетрадью и письменными заметками">
+       <div class="hero-art" aria-hidden="true"></div>
+       <div class="hero-demo" aria-label="Интерактивная орфографическая разминка">
+         <div class="demo-label"><span>ПРОБА ПЕРА · № 01</span><span>1 действие</span></div>
+         <p class="word-prompt">Где прячется орфограмма?</p>
+         <div class="word-stage"><div class="big-word" id="heroWord" aria-label="Слово прикасаться"></div></div>
+         <div id="heroFeedback" class="feedback" aria-live="polite"></div>
+         <p class="micro">Нажми на букву, написание которой нужно объяснить правилом.</p>
+       </div>
+     </div>
+   </section>
+   <section class="section entry-section reference-entry" aria-labelledby="entry-heading">
+     <div class="section-head"><div><p class="eyebrow">СТРАНИЦА 02 / КОМУ И ЧЕМ ПОМОЖЕМ</p><h2 id="entry-heading">Найди свою <em>страницу</em></h2></div><p class="section-intro">От маленького открытия до уверенной грамотности. Каждому — своя дорога.</p></div>
+     <div class="entry-grid">
+       <button class="entry-card entry-learner" data-route="student"><span class="entry-num">01 / УЧЕНИКУ</span><span class="entry-art" aria-hidden="true"></span><strong>Я ученик <span aria-hidden="true">↗</span></strong><span>Играй, тренируйся и открывай русский язык.</span></button>
+       <button class="entry-card entry-teacher" data-route="teacher"><span class="entry-num">02 / УЧИТЕЛЮ</span><span class="entry-art" aria-hidden="true"></span><strong>Я учитель <span aria-hidden="true">↗</span></strong><span>Диагностика, задания и работа с классом.</span></button>
+       <button class="entry-card entry-library" data-route="library"><span class="entry-num">03 / БИБЛИОТЕКА</span><span class="entry-art" aria-hidden="true"></span><strong>Орфограммы <span aria-hidden="true">↗</span></strong><span>Правила, алгоритмы, примеры и тренажёры.</span></button>
+       <button class="entry-card entry-print" data-route="worksheet"><span class="entry-num">04 / МАСТЕРСКАЯ</span><span class="entry-art" aria-hidden="true"></span><strong>Печатные работы <span aria-hidden="true">↗</span></strong><span>Собери варианты заданий и ключи к ним.</span></button>
+     </div>
+   </section>
+   <section class="section home-games" aria-labelledby="home-games-title">
+     <div class="section-head"><div><p class="eyebrow">СТРАНИЦА 03 / УЧИМСЯ ИГРАЯ</p><h2 id="home-games-title">Игровая <em>практика</em></h2></div><p class="section-intro handnote">Играй. Ищи подсказки.<br>Находи закономерности. ♡</p></div>
+     <div class="home-games-grid">
+       <button class="home-game game-hunt" data-game="hunt"><span class="home-game-index">ДЕЛО № 01</span><span class="home-game-art" aria-hidden="true"></span><strong>Орфоохота <span aria-hidden="true">↗</span></strong><span>Найди опасные места в словах.</span><small>ВНИМАТЕЛЬНОСТЬ</small></button>
+       <button class="home-game game-editor" data-game="editor"><span class="home-game-index">ДЕЛО № 02</span><span class="home-game-art" aria-hidden="true"></span><strong>Редактор вырезок <span aria-hidden="true">↗</span></strong><span>Исправь ошибки в газетных заметках.</span><small>САМОИСПРАВЛЕНИЕ</small></button>
+       <button class="home-game game-build" data-game="build"><span class="home-game-index">ДЕЛО № 03</span><span class="home-game-art" aria-hidden="true"></span><strong>Слово-конструктор <span aria-hidden="true">↗</span></strong><span>Выбери букву и объясни правило.</span><small>АЛГОРИТМ</small></button>
+       <button class="home-game game-detective" data-game="detective"><span class="home-game-index">ДЕЛО № 04</span><span class="home-game-art" aria-hidden="true"></span><strong>Орфо-детектив <span aria-hidden="true">↗</span></strong><span>Разбери причину ошибки.</span><small>АНАЛИЗ ОШИБОК</small></button>
+     </div>
+   </section>
+   <section class="section method-section reference-method" aria-labelledby="method-heading">
+     <div class="section-head"><div><p class="eyebrow">СТРАНИЦА 04 / МЕТОДИКА</p><h2 id="method-heading">Как работает <em>ОрфоЗор</em></h2></div><p class="section-intro">Не просто проверяем букву, а учимся понимать, почему она пишется именно так.</p></div>
+     <div class="flow"><div class="flow-step"><b>01 · Диагностика</b>Находим сильные стороны и зоны роста.</div><div class="flow-step"><b>02 · Анализ</b>Выясняем, на каком шаге появилась трудность.</div><div class="flow-step"><b>03 · Практика</b>Подбираем упражнения и игровые задания.</div><div class="flow-step"><b>04 · Поддержка</b>Объясняем правило и предлагаем подсказки.</div><div class="flow-step"><b>05 · Динамика</b>Видим прогресс, а не только количество ошибок.</div></div>
+     <p class="method-footnote">Маленькие шаги — большие открытия. <span aria-hidden="true">♡</span></p>
+   </section>
+   <div class="collage-bottom" aria-hidden="true"></div>
  `);
- renderClickableWord('heroWord','прикасаться',[4],(ok)=>{const f=$('#heroFeedback');f.className='feedback show '+(ok?'ok':'retry');f.innerHTML=ok?'✅ <strong>Верно.</strong> Ты заметил орфограмму до проверки.':'↺ <strong>Попробуй ещё.</strong> Сначала найди гласную в корне, где выбирается А/О.'});
+ renderClickableWord('heroWord','прикасаться',[4],(ok)=>{const f=$('#heroFeedback');f.className='feedback show '+(ok?'ok':'retry');f.innerHTML=ok?'✓ <strong>Верно.</strong> Ты заметил орфограмму.':'↺ <strong>Попробуй ещё.</strong> Найди гласную корня, написание которой зависит от суффикса -А-.'});
 }
 
 function renderClickableWord(containerId, word, correctIndices, cb){
