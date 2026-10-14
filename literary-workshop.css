@@ -299,3 +299,43 @@
   line-height:1.75;padding:0 1px;min-height:25px;
  }
 }
+
+/* Working manuscript/teacher draft controls */
+#main .page:not(:has(.reference-hero)) .creator-atelier{
+ position:relative;background:#F8ECDD;border:1px solid #D2B49A;border-left:5px solid #973F4D;
+ border-radius:2px;box-shadow:4px 6px 0 rgba(80,54,39,.07);padding:22px 20px;
+}
+#main .page:not(:has(.reference-hero)) .creator-atelier .tag{
+ color:#9B414D;font:800 .64rem/1.6 "Golos Text",sans-serif;letter-spacing:.13em;
+ border-bottom:1px solid #D7BEAA;padding-bottom:13px;margin-bottom:14px;
+}
+#main .page:not(:has(.reference-hero)) .creator-draft{
+ background:#FFFAF4;border:1px solid #DCC5B3;padding:15px 16px 18px;
+ box-shadow:3px 4px 0 rgba(94,66,48,.055);margin:13px 0;
+}
+#main .page:not(:has(.reference-hero)) .creator-draft strong{
+ display:block;font:600 1.1rem/1.4 Literata,Georgia,serif;color:#66353A;margin-bottom:9px;
+}
+#main .page:not(:has(.reference-hero)) .creator-draft-prompt{line-height:1.65}
+#main .page:not(:has(.reference-hero)) .creator-draft-editor{
+ background:#F4E8DA;border-left:3px solid #A65B5D;padding:15px;margin:12px 0;
+}
+#main .page:not(:has(.reference-hero)) .creator-draft-editor[hidden]{display:none!important}
+#main .page:not(:has(.reference-hero)) .creator-draft-editor label{display:block;font-weight:750;margin:0 0 10px}
+#main .page:not(:has(.reference-hero)) .creator-draft-editor textarea{
+ width:100%;display:block;min-height:85px;margin-top:6px;border:1px solid #CBB5A2;
+ padding:10px 12px;background:#FFFCF7;color:#382F2C;border-radius:2px;
+ font:400 .89rem/1.5 "Golos Text",sans-serif;resize:vertical;
+}
+#main .page:not(:has(.reference-hero)) .creator-atelier .checkline{
+ background:#FFF7E9;border:1px dashed #C3A68F;padding:12px;display:flex;gap:10px;
+}
+#main .page:not(:has(.reference-hero)) button:focus-visible,
+#main .page:not(:has(.reference-hero)) input:focus-visible,
+#main .page:not(:has(.reference-hero)) textarea:focus-visible{
+ outline:3px solid #A74F5C;outline-offset:3px;
+}
+@media(max-width:620px){
+ #main .page:not(:has(.reference-hero)) .creator-atelier{padding:15px 12px}
+ #main .page:not(:has(.reference-hero)) .creator-draft{padding:14px 11px}
+}
