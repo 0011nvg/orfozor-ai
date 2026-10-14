@@ -1195,6 +1195,16 @@ function renderCreator(){page(`<p class="eyebrow">Учительский реж�
 let creatorDraft=[];
 let creatorPool=[];
 const creatorEsc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+function creatorKey(t){
+ if(t.manualKey)return t.manualKey;
+ const main=t.type==='choice'&&t.options&&t.correct!==undefined
+   ?'Верный вариант: '+t.options[t.correct]+'. '
+   :t.type==='editor'&&t.expected?'Нужно написать: '+t.expected+'. '
+   :t.type==='spot'&&t.word&&t.correct?'Опасное место: '+t.correct.map(i=>t.word[i]).join(', ')+'. '
+   :'';
+ return main+(t.explanation||'Ответ и объяснение необходимо проверить учителю.');
+}
+
 function generatePreview(){
  const topic=$('#cTopic').value,stage=+$('#cStage').value;
  const amount=+$('#cCount').value,level=$('#cDifficulty').value,type=$('#cType').value;
@@ -1222,9 +1232,9 @@ function renderCreatorDraft(){
   '<strong>Карточка '+(i+1)+'. '+creatorEsc(t.title)+'</strong>'+
   '<div class="creator-draft-prompt">'+creatorEsc(t.prompt)+'</div>'+
   (t.options?'<p class="micro">Варианты: '+creatorEsc(t.options.join(' / '))+'</p>':'')+
-  '<p class="micro">Ключ / объяснение: '+creatorEsc(t.explanation||t.expected||'Требует заполнения учителем')+'</p>'+
+  '<p class="micro">Ключ / объяснение: '+creatorEsc(creatorKey(t))+'</p>'+
   '<div class="creator-draft-editor" hidden><label>Формулировка задания<textarea class="text-input" data-creator-prompt="'+i+'" rows="3">'+creatorEsc(t.prompt)+'</textarea></label>'+
-  '<label>Ключ и объяснение<textarea class="text-input" data-creator-answer="'+i+'" rows="3">'+creatorEsc(t.explanation||t.expected||'')+'</textarea></label></div>'+
+  '<label>Ключ и объяснение<textarea class="text-input" data-creator-answer="'+i+'" rows="3">'+creatorEsc(creatorKey(t))+'</textarea></label></div>'+
   '<div class="actions" style="margin-top:9px"><button class="btn secondary small" data-creator-action="edit" data-index="'+i+'" type="button">Изменить</button>'+
   '<button class="btn secondary small" data-creator-action="replace" data-index="'+i+'" type="button">Заменить пример</button>'+
   '<button class="btn secondary small" data-creator-action="remove" data-index="'+i+'" type="button">Удалить</button></div></article>').join('')+
@@ -1246,7 +1256,7 @@ function renderCreatorDraft(){
   }
  });
  preview.querySelectorAll('[data-creator-prompt]').forEach(x=>x.oninput=()=>{creatorDraft[+x.dataset.creatorPrompt].prompt=x.value;const summary=x.closest('.creator-draft').querySelector('.creator-draft-prompt');summary.textContent=x.value});
- preview.querySelectorAll('[data-creator-answer]').forEach(x=>x.oninput=()=>{creatorDraft[+x.dataset.creatorAnswer].explanation=x.value});
+ preview.querySelectorAll('[data-creator-answer]').forEach(x=>x.oninput=()=>{creatorDraft[+x.dataset.creatorAnswer].manualKey=x.value});
  preview.querySelector('#creatorAdd').onclick=()=>{
   creatorDraft.push({id:'manual-'+Date.now(),topic:$('#cTopic').value,title:'Авторское задание',prompt:'Введите формулировку задания.',explanation:'Введите обоснованный ответ.'});
   renderCreatorDraft();
@@ -1257,7 +1267,7 @@ function renderCreatorDraft(){
  preview.querySelector('#publishBtn').onclick=()=>{
   const title='ОрфоЗор AI — редакторский черновик ('+$('#cClass').value+', '+$('#cTopic').selectedOptions[0].text+')';
   const lines=[title,'Кому: '+$('#cStudent').value,'Этап: '+$('#cStage').value,'Статус: подготовлено и проверено учителем','',
-  ...creatorDraft.flatMap((t,i)=>[(i+1)+'. '+t.title,t.prompt,t.options?'Варианты: '+t.options.join(' | '):'','Ключ / объяснение: '+(t.explanation||t.expected||'нужно заполнить'),''])];
+  ...creatorDraft.flatMap((t,i)=>[(i+1)+'. '+t.title,t.prompt,t.options?'Варианты: '+t.options.join(' | '):'','Ключ / объяснение: '+creatorKey(t),''])];
   const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='orfozor_trainer_draft.txt';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
  };
