@@ -78,6 +78,12 @@ function renderAdvancedGames(){
   document.querySelector('#againGame').onclick=()=>{run={mode,index:0,errors:0,firstTry:0,solved:false,attempts:0};renderAdvancedGames()};return;
  }
  const round=game.rounds[run.index];
+ const proofTokens=mode==='editor'
+   ?round.story.split(/(\s+)/).map(token=>{
+     if(!/[а-яё]/i.test(token))return E(token);
+     const word=token.replace(/^[^а-яё]+|[^а-яё]+$/gi,'');
+     return '<button type="button" class="proof-word" data-proof-word="'+E(word)+'" aria-label="Выбрать для проверки: '+E(word)+'">'+E(token)+'</button>';
+   }).join(''):'';
  let stage='';
  if(mode==='hunt'){
   stage='<p class="game-instruction">'+E(round.subtitle)+'</p><div class="hunt-grid">'+round.items.map(([pattern,,why],i)=>{const p=pattern.split('·');return '<label class="hunt-item"><span class="hunt-number">СЛОВО '+(i+1)+'</span><span class="hunt-spelling">'+E(p[0])+'<input class="hunt-letter" data-index="'+i+'" aria-label="Пропущенная буква, слово '+(i+1)+'" maxlength="2" autocapitalize="off" autocomplete="off" spellcheck="false">'+E(p[1])+'</span><span class="hunt-feedback" id="huntResult'+i+'"></span></label>'}).join('')+'</div>';
@@ -101,13 +107,13 @@ function renderAdvancedGames(){
     '<p class="news-deck">'+E(press.lead)+'</p>'+
     '<div class="news-byline">ТЕКСТ ПЕРЕД ПЕЧАТЬЮ · <span>КОРРЕКТОРСКИЙ ЭКЗЕМПЛЯР</span></div>'+
     '<div class="news-story-grid"><div class="news-story-main"><p class="news-opening">'+E(press.intro)+'</p>'+
-    '<p class="news-copy-to-edit">'+E(round.story)+'</p></div>'+
+    '<p class="news-copy-to-edit">'+proofTokens+'</p></div>'+
     '<div class="news-story-aside"><figure class="news-engraving" aria-label="Декоративная газетная гравюра"><span class="news-engraving-art" aria-hidden="true">✒</span><figcaption>ИЗ РЕДАКЦИОННОГО АРХИВА<br>ИЛЛЮСТРАЦИЯ № '+(run.index+1)+'</figcaption></figure>'+
     '<p class="news-after">'+E(press.after)+'</p><blockquote class="news-pullquote">«'+E(press.quote)+'»</blockquote></div></div>'+
     '<div class="news-bottomline"><span>ОРФОЗОР · ЛАБОРАТОРИЯ РУССКОГО СЛОВА</span><span>СТР. 0'+(run.index+1)+'</span></div>'+
     '</article>'+
     '<section class="correction-desk" aria-label="Бланк корректуры"><div class="correction-desk-head"><div><span class="correction-kicker">РАБОЧИЙ ЛИСТ КОРРЕКТОРА</span><h3>Помоги газете выйти без ошибок</h3></div><span class="correction-pencil" aria-hidden="true">✎</span></div>'+
-    '<p class="game-instruction">В газетной заметке '+round.errors.length+' орфографические ошибки. Найди каждую и впиши <strong>исправленные слова по порядку их появления в заметке</strong>. После проверки появятся объяснения.</p>'+
+    '<p class="game-instruction">В газетной заметке '+round.errors.length+' орфографические ошибки. Нажми на подозрительное слово в газете: оно попадёт в свободное поле редактора. Исправь <strong>все ошибки по порядку их появления в заметке</strong>. После проверки появятся объяснения.</p>'+
     '<div class="editor-fields">'+round.errors.map((e,i)=>'<label><span>Правка № '+String(i+1).padStart(2,'0')+'</span><input class="editor-correction text-input" data-index="'+i+'" placeholder="Исправленное слово" aria-label="Исправление '+(i+1)+'" autocomplete="off" spellcheck="false"><small class="editor-msg" id="editorResult'+i+'"></small></label>').join('')+'</div></section>';
  }
  if(mode==='build'){
@@ -120,6 +126,14 @@ function renderAdvancedGames(){
  let selection=null,localAttempts=0;
  document.querySelectorAll('.constructor-tile').forEach(b=>b.onclick=()=>{if(run.solved)return;selection=b.dataset.piece;document.querySelectorAll('.constructor-tile').forEach(x=>{x.classList.remove('selected');x.setAttribute('aria-pressed','false')});b.classList.add('selected');b.setAttribute('aria-pressed','true');const slot=document.querySelector('#constructorSlot');slot.textContent=selection;slot.classList.remove('tile-snap');void slot.offsetWidth;slot.classList.add('tile-snap');});
  document.querySelectorAll('.detective-answer').forEach(b=>b.onclick=()=>{if(run.solved)return;selection=+b.dataset.choice;document.querySelectorAll('.detective-answer').forEach(x=>{x.classList.remove('selected');x.setAttribute('aria-pressed','false')});b.classList.add('selected');b.setAttribute('aria-pressed','true')});
+ document.querySelectorAll('.proof-word').forEach(b=>b.onclick=()=>{
+   if(run.solved)return;
+   document.querySelectorAll('.proof-word').forEach(x=>x.classList.remove('proof-selected'));
+   b.classList.add('proof-selected');
+   const fields=Array.from(document.querySelectorAll('.editor-correction'));
+   const target=fields.find(x=>!x.value.trim())||fields.find(x=>x!==document.activeElement)||fields[0];
+   if(target){target.value=b.dataset.proofWord||'';target.focus();target.select();}
+ });
  document.querySelector('#advancedHint').onclick=()=>{
   const hints={hunt:'Определи морфему и условие выбора для каждого слова: приставка, корень, суффикс или ударение.',editor:'Ошибок ровно столько, сколько полей. Читай предложение по частям и проверяй каждую трудную морфему.',build:'Обрати внимание на смысл слова и на морфему после пропуска.',detective:'Отдели три шага: заметить место, выбрать правило, применить условие.'};
   explain('<strong>Подсказка.</strong> '+hints[mode], 'hint');
