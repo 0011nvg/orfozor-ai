@@ -109,4 +109,5 @@ function renderAdvancedGames(){
  };
 }
 routeMap.games=renderAdvancedGames;
+route();
 })();
