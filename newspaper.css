@@ -1,0 +1,82 @@
+
+/* «Школьный вестник»: типографская газета внутри игры «Редактор вырезок» */
+.game-mode-editor .newgame-paper{max-width:1030px;margin-inline:auto;}
+.game-mode-editor .newgame-paper>h2{font-family:Literata,Georgia,serif;font-size:clamp(1.35rem,2.8vw,2rem);}
+.editor-newspaper.newspaper-authentic{
+ --news-ink:#282722;--news-muted:#56544f;--news-rule:#75716a;
+ position:relative;display:block;overflow:visible;isolation:isolate;
+ margin:26px 0 29px;padding:clamp(16px,3.4vw,34px);
+ border:1px solid #968c7d;border-left:1px solid #968c7d;border-radius:0;
+ background-color:#f2eedf;
+ background-image:
+  radial-gradient(circle at 1px 1px,rgba(77,71,56,.12) .55px,transparent .85px),
+  repeating-linear-gradient(0deg,rgba(99,92,78,.025) 0px,rgba(99,92,78,.025) 1px,transparent 1px,transparent 4px),
+  linear-gradient(112deg,rgba(90,78,63,.07) 0,transparent 17%,rgba(255,255,255,.18) 52%,rgba(59,48,36,.045) 100%);
+ background-size:7px 7px,auto,auto;
+ box-shadow:2px 4px 0 #d6cbb8,7px 10px 0 rgba(68,57,41,.09),0 22px 34px rgba(48,39,25,.09);
+ transform:rotate(-.25deg);color:var(--news-ink);
+}
+.editor-newspaper.newspaper-authentic:after{content:"";position:absolute;z-index:-1;pointer-events:none;inset:-2px 0 auto; height:8px;background:repeating-linear-gradient(100deg,transparent 0 9px,rgba(112,101,83,.16) 9px 10px,transparent 10px 23px);opacity:.65}
+.news-folio{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:0 0 10px;border-bottom:1px solid #696157;text-align:center;letter-spacing:.11em;font:700 clamp(.53rem,1.05vw,.67rem)/1.5 "Golos Text",sans-serif;color:#514d44}
+.news-nameplate{display:grid;grid-template-columns:60px minmax(0,1fr) 128px;align-items:center;gap:10px;padding:14px 1px 12px}
+.news-name{font:400 clamp(2.3rem,5.6vw,5rem)/1.12 Prata,Georgia,serif;letter-spacing:-.073em;text-align:center;color:#242421}
+.news-name i{font-style:normal;white-space:nowrap}
+.news-emblem{font:400 2.5rem/1 Literata,Georgia,serif;color:#4d4b42;text-align:center;transform:rotate(-15deg)}
+.news-name-caption{font:650 .56rem/1.85 "Golos Text",sans-serif;text-align:center;letter-spacing:.08em;color:#454239}
+.news-dateline{border-top:4px double #34312c;border-bottom:2px solid #34312c;padding:6px 0;display:flex;flex-wrap:wrap;gap:5px;justify-content:space-between;font:800 clamp(.48rem,.95vw,.61rem)/1.45 "Golos Text",sans-serif;letter-spacing:.095em;color:#3f3a34}
+.news-rubric{text-align:center;letter-spacing:.22em;text-transform:uppercase;font:800 .62rem/1.4 "Golos Text",sans-serif;color:#8c3f3c;padding:20px 0 9px}
+.editor-newspaper.newspaper-authentic .news-headline{font:600 clamp(1.85rem,4.5vw,3.7rem)/1.16 Literata,Georgia,serif!important;text-align:center;letter-spacing:-.06em;text-transform:uppercase;color:#222322;margin:0 auto 12px;max-width:800px}
+.editor-newspaper.newspaper-authentic .news-deck{font:500 clamp(1rem,1.9vw,1.29rem)/1.46 Literata,Georgia,serif;text-align:center;max-width:670px;margin:0 auto 18px;color:#4d4840}
+.news-byline{font:800 .57rem/1.7 "Golos Text",sans-serif;text-align:center;letter-spacing:.12em;color:#777064;border-top:1px solid #827b70;border-bottom:1px solid #827b70;padding:8px 0}
+.news-byline span{color:#8b3e3b}
+.news-story-grid{display:grid;grid-template-columns:minmax(0,1.48fr) minmax(0,.92fr);gap:clamp(16px,3.2vw,34px);padding:22px 0 22px}
+.news-story-main{padding-right:clamp(8px,2vw,21px);border-right:1px solid #b2a99b}
+.editor-newspaper.newspaper-authentic .news-story-main p,
+.editor-newspaper.newspaper-authentic .news-story-aside p{font:400 clamp(.91rem,1.33vw,1.03rem)/1.75 Literata,Georgia,serif;text-align:justify;hyphens:auto;color:#37342f;letter-spacing:0;margin:0 0 17px}
+.editor-newspaper.newspaper-authentic .news-opening:first-letter{float:left;font:500 3.45rem/.83 Prata,Georgia,serif;padding:8px 8px 0 0;color:#7b3c3d}
+.editor-newspaper.newspaper-authentic .news-copy-to-edit{padding:12px 13px 13px;border:1px dashed #ad766c;border-left:3px solid #a4514a;background:rgba(251,248,235,.7);position:relative;margin:9px 0 0;box-shadow:2px 3px 0 rgba(128,87,70,.08)}
+.news-copy-to-edit:before{content:"ПРОВЕРЬ ОРФОГРАФИЮ";display:block;font:800 .58rem/1.4 "Golos Text",sans-serif;letter-spacing:.13em;color:#8e4542;margin-bottom:10px}
+.news-engraving{margin:0 0 15px;padding:7px;background:#ddd7c6;border:1px solid #9a9283;box-shadow:inset 0 0 0 4px rgba(241,239,225,.66)}
+.news-engraving-art{height:112px;display:grid;place-items:center;background:radial-gradient(ellipse at 45% 44%,transparent 20%,#88817233 21%,transparent 22%),repeating-linear-gradient(147deg,rgba(58,57,48,.21) 0 .7px,transparent .7px 5px),linear-gradient(128deg,#dfdccf,#c8c2b3);font:400 4.9rem/1 Georgia,serif;color:#433e35;filter:grayscale(1)}
+.news-engraving figcaption{margin:7px 3px 2px;font:800 .52rem/1.6 "Golos Text",sans-serif;letter-spacing:.11em;text-align:center;color:#534e45}
+.editor-newspaper.newspaper-authentic .news-pullquote{margin:10px 0 0;padding:13px 7px 10px;border-top:3px double #69625a;border-bottom:1px solid #69625a;font:italic 600 1.15rem/1.5 Literata,Georgia,serif;color:#5f4540;text-align:center}
+.news-bottomline{display:flex;justify-content:space-between;gap:8px;padding:10px 0 0;border-top:3px double #454039;font:800 .58rem/1.5 "Golos Text",sans-serif;letter-spacing:.1em;color:#4d473d}
+.correction-desk{position:relative;margin:26px 0 10px;padding:clamp(16px,3vw,28px);border:1px solid #d0b7a2;background:#fff8ed;box-shadow:4px 6px 0 rgba(100,70,52,.1)}
+.correction-desk:before{content:"";position:absolute;right:26px;top:-12px;width:86px;height:24px;background:#d6b49e77;border:1px solid #d1b19f33;transform:rotate(5deg);pointer-events:none}
+.correction-desk-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.correction-kicker{display:block;font:800 .59rem/1.5 "Golos Text",sans-serif;letter-spacing:.14em;color:#9c4746}
+.correction-desk-head h3{font:600 clamp(1.25rem,2.3vw,1.75rem)/1.35 Literata,Georgia,serif;color:#403036;margin:7px 0 5px}
+.correction-pencil{font:500 2.3rem/1 "Caveat",cursive;color:#aa4b4c;transform:rotate(-17deg)}
+.correction-desk .game-instruction{font-size:.88rem;line-height:1.64;margin:14px 0 21px;color:#594b43}
+.correction-desk .editor-fields{grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.correction-desk .editor-fields label{position:relative;padding:14px 12px;background:#f6e8db;border:1px solid #dec5b0;box-shadow:2px 3px 0 rgba(80,50,35,.07)}
+.correction-desk .editor-fields label:nth-child(2){background:#eceadd}
+.correction-desk .editor-fields label:nth-child(3){background:#f1e3e7}
+.correction-desk .editor-fields label>span{font:800 .7rem/1.4 "Golos Text",sans-serif;color:#754e4a}
+.correction-desk .editor-correction{border:0;border-bottom:2px solid #9c7768;background:#fffcf6;border-radius:0;padding:12px 9px;font:600 .91rem/1.4 "Golos Text",sans-serif;min-width:0}
+.correction-desk .editor-correction:focus{outline:2px solid #a75051;outline-offset:3px}
+.correction-desk .editor-msg{margin-top:6px}
+@media (max-width:840px){.news-nameplate{grid-template-columns:45px 1fr 103px}.news-emblem{font-size:1.9rem}.news-name{font-size:clamp(2.3rem,5.5vw,3.8rem)}.news-name-caption{font-size:.52rem}.news-story-grid{grid-template-columns:minmax(0,1.18fr) minmax(0,1fr)}.correction-desk .editor-fields{grid-template-columns:1fr}}
+@media (max-width:650px){
+ .editor-newspaper.newspaper-authentic{padding:15px 12px 17px;transform:none;margin:18px 0 26px}
+ .news-folio{font-size:.51rem}.news-nameplate{grid-template-columns:1fr;gap:6px;padding:12px 0 10px}
+ .news-emblem,.news-name-caption{display:none}.news-name{font-size:clamp(2.5rem,9.6vw,3.7rem);line-height:1.25}
+ .news-dateline{justify-content:center;text-align:center;gap:7px;font-size:.49rem}
+ .news-dateline span:last-child{display:none}
+ .news-rubric{padding:14px 0 8px}
+ .editor-newspaper.newspaper-authentic .news-headline{font-size:clamp(1.62rem,7.3vw,2.55rem)!important}
+ .editor-newspaper.newspaper-authentic .news-deck{font-size:1rem;line-height:1.45}
+ .news-story-grid{grid-template-columns:1fr;gap:10px;padding:16px 0}
+ .news-story-main{border:0;padding:0}
+ .news-story-aside{display:grid;grid-template-columns:94px minmax(0,1fr);gap:12px;align-items:start}
+ .news-engraving{margin:0}.news-engraving-art{height:90px;font-size:3rem}
+ .news-engraving figcaption{font-size:.4rem;letter-spacing:.04em}
+ .editor-newspaper.newspaper-authentic .news-story-aside p{margin:0;font-size:.85rem;line-height:1.55}
+ .news-pullquote{grid-column:1/-1;font-size:1rem!important;margin:0!important}
+ .news-copy-to-edit:before{font-size:.52rem}
+ .news-bottomline{font-size:.47rem}
+ .correction-desk{padding:17px 12px}.correction-desk .editor-fields{grid-template-columns:1fr}
+ .correction-desk-head h3{font-size:1.2rem}.correction-pencil{font-size:1.75rem}
+}
+@media (prefers-reduced-motion:reduce){.newspaper-authentic{transition:none}}
+@media print{.editor-newspaper.newspaper-authentic{box-shadow:none;transform:none!important;background:#fff!important}.news-pullquote,.news-headline{color:#222!important}.correction-desk{break-inside:avoid;box-shadow:none}}
