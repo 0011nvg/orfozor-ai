@@ -62,7 +62,32 @@ function renderAdvancedGames(){
   stage='<p class="game-instruction">'+E(round.subtitle)+'</p><div class="hunt-grid">'+round.items.map(([pattern,,why],i)=>{const p=pattern.split('·');return '<label class="hunt-item"><span class="hunt-number">СЛОВО '+(i+1)+'</span><span class="hunt-spelling">'+E(p[0])+'<input class="hunt-letter" data-index="'+i+'" aria-label="Пропущенная буква, слово '+(i+1)+'" maxlength="2" autocapitalize="off" autocomplete="off" spellcheck="false">'+E(p[1])+'</span><span class="hunt-feedback" id="huntResult'+i+'"></span></label>'}).join('')+'</div>';
  }
  if(mode==='editor'){
-  stage='<div class="editor-newspaper"><span class="newspaper-masthead">ШКОЛЬНЫЙ ВЕСТНИК / КОРРЕКТУРА</span><h3>'+E(round.headline)+'</h3><p>'+E(round.story)+'</p></div><p class="game-instruction">В тексте '+round.errors.length+' ошибки. Найди их и впиши исправленные фрагменты <strong>по порядку появления</strong>.</p><div class="editor-fields">'+round.errors.map((e,i)=>'<label>Исправление '+(i+1)+'<input class="editor-correction text-input" data-index="'+i+'" placeholder="Напиши верно" autocomplete="off" spellcheck="false"><small class="editor-msg" id="editorResult'+i+'"></small></label>').join('')+'</div>';
+  const pressPages=[
+   {rubric:'ШКОЛЬНЫЕ НОВОСТИ',lead:'Литературный вечер открылся разговором о том, как рождаются точные слова.',intro:'В школьной библиотеке готовят небольшую выставку и собирают материалы для стенгазеты.',after:'Редактор попросил проверить имена, подписи и трудные суффиксы, прежде чем выпуск попадёт на доску объявлений.',quote:'Каждая буква на своём месте.'},
+   {rubric:'КУЛЬТУРА / ТЕАТР',lead:'Школьная студия готовит постановку, вдохновлённую историей родного города.',intro:'Участники репетируют диалоги, подбирают костюмы и вместе обсуждают смысл каждого эпизода.',after:'Корректору предстоит проверить заметку до начала репетиции: её прочтут зрители и актёры.',quote:'На сцене нет случайных слов.'},
+   {rubric:'ИЗ МУЗЕЙНОГО ЗАЛА',lead:'Небольшая экспозиция объединила предметы из разных эпох.',intro:'Экскурсоводы подготовили подписи к витринам и рассказали, как по деталям можно узнать историю вещи.',after:'Перед открытием экспозиции сотрудники решили внимательно вычитать все подписи.',quote:'История начинается с детали.'},
+   {rubric:'ПРИРОДА / НАБЛЮДЕНИЯ',lead:'Юные художники представили рисунки природы после первого снега.',intro:'Иллюстрации готовят к публикации рядом с короткими зарисовками о зиме.',after:'Подпись к каждому рисунку должна быть точной: читатели замечают даже маленькие ошибки.',quote:'Слово тоже умеет рисовать.'},
+   {rubric:'КНИЖНАЯ ПОЛКА',lead:'Книжный клуб обсудил необычный рассказ и его противоречивых героев.',intro:'Рецензенты сравнили свои впечатления, предложили заголовки и выбрали цитату для стенгазеты.',after:'Теперь осталось вычитать текст: от смысла противопоставления зависит написание НЕ.',quote:'У каждого рассказа есть второй смысл.'},
+   {rubric:'ХРОНИКА КРУЖКА',lead:'Участники школьного кружка собрали памятный альбом.',intro:'В альбоме разместили рисунки, фотографии и небольшие рассказы о самых интересных событиях года.',after:'Редактор напоминает: значение приставки помогает проверить написание слова.',quote:'Память складывается из маленьких историй.'}
+  ];
+  const press=pressPages[run.index%pressPages.length];
+  stage='<article class="editor-newspaper newspaper-authentic" aria-label="Учебная газетная вырезка с орфографическими ошибками">'+
+    '<div class="news-folio"><span>УЧЕБНЫЙ МАКЕТ · № '+String(run.index+1).padStart(2,'0')+'</span><span>5–6 КЛАСС · РУССКИЙ ЯЗЫК</span></div>'+
+    '<div class="news-nameplate"><span class="news-emblem" aria-hidden="true">✳</span><div class="news-name">Школьный <i>вестник</i></div><span class="news-name-caption">МАЛАЯ ГАЗЕТА<br>О БОЛЬШИХ СЛОВАХ</span></div>'+
+    '<div class="news-dateline"><span>ВЫПУСК ДЛЯ КОРРЕКТУРЫ</span><span>РЕДАКЦИЯ «ОРФОЗОР»</span><span>ЦЕНА: ВНИМАНИЕ К СЛОВУ</span></div>'+
+    '<div class="news-rubric">'+E(press.rubric)+' / СПЕЦВЫПУСК</div>'+
+    '<h3 class="news-headline">'+E(round.headline)+'</h3>'+
+    '<p class="news-deck">'+E(press.lead)+'</p>'+
+    '<div class="news-byline">ТЕКСТ ПЕРЕД ПЕЧАТЬЮ · <span>КОРРЕКТОРСКИЙ ЭКЗЕМПЛЯР</span></div>'+
+    '<div class="news-story-grid"><div class="news-story-main"><p class="news-opening">'+E(press.intro)+'</p>'+
+    '<p class="news-copy-to-edit">'+E(round.story)+'</p></div>'+
+    '<div class="news-story-aside"><figure class="news-engraving" aria-label="Декоративная газетная гравюра"><span class="news-engraving-art" aria-hidden="true">✒</span><figcaption>ИЗ РЕДАКЦИОННОГО АРХИВА<br>ИЛЛЮСТРАЦИЯ № '+(run.index+1)+'</figcaption></figure>'+
+    '<p class="news-after">'+E(press.after)+'</p><blockquote class="news-pullquote">«'+E(press.quote)+'»</blockquote></div></div>'+
+    '<div class="news-bottomline"><span>ОРФОЗОР · ЛАБОРАТОРИЯ РУССКОГО СЛОВА</span><span>СТР. 0'+(run.index+1)+'</span></div>'+
+    '</article>'+
+    '<section class="correction-desk" aria-label="Бланк корректуры"><div class="correction-desk-head"><div><span class="correction-kicker">РАБОЧИЙ ЛИСТ КОРРЕКТОРА</span><h3>Помоги газете выйти без ошибок</h3></div><span class="correction-pencil" aria-hidden="true">✎</span></div>'+
+    '<p class="game-instruction">В газетной заметке '+round.errors.length+' орфографические ошибки. Найди каждую и впиши <strong>исправленные слова по порядку их появления в заметке</strong>. После проверки появятся объяснения.</p>'+
+    '<div class="editor-fields">'+round.errors.map((e,i)=>'<label><span>Правка № '+String(i+1).padStart(2,'0')+'</span><input class="editor-correction text-input" data-index="'+i+'" placeholder="Исправленное слово" aria-label="Исправление '+(i+1)+'" autocomplete="off" spellcheck="false"><small class="editor-msg" id="editorResult'+i+'"></small></label>').join('')+'</div></section>';
  }
  if(mode==='build'){
   stage='<p class="game-instruction">Собери слово по смыслу: '+E(round.word)+'. Выбери правильный фрагмент и объясни правило.</p><div class="constructor-view" id="constructorView"><span>'+E(round.prefix)+'</span><span class="constructor-slot" id="constructorSlot">?</span><span>'+E(round.suffix)+'</span></div><div class="constructor-tiles">'+round.options.map((x,i)=>'<button class="constructor-tile" aria-pressed="false" data-piece="'+E(x)+'">'+E(x)+'</button>').join('')+'</div><p class="constructor-status" id="constructorStatus">Поставь деталь на место.</p>';
