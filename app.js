@@ -1191,9 +1191,77 @@ function renderClass(){page(`<p class="eyebrow">Страница класса ·
 
 function renderStudentProfile(){const s=demoStudents.find(x=>x.id===state.lastStudentId)||demoStudents[3];page(`<p class="eyebrow">Профиль ученика · демо</p><h1>${s.name}</h1><div class="grid" style="margin-top:28px">${metricCard('Тренировок',s.sessions,'за текущий цикл','yellow')}${metricCard('Подсказки',s.hints,'использованы за цикл')}${metricCard('Динамика',`${s.trend>=0?'+':''}${s.trend}%`,'по сопоставимым заданиям','blue')}<article class="card wide"><h3>Карта затруднений</h3><div class="barset">${barrow('Обнаружение',72)}${barrow('Классификация',58)}${barrow('Применение правила',66)}${barrow('Перенос в текст',49)}</div></article><article class="card"><h3>Частые ошибки</h3><div class="kicker-row"><span class="pill pink">${s.risk}</span><span class="pill">2+ попытки</span><span class="pill">подсказка 2</span></div><p>Система различает повторяющийся паттерн и разовую ошибку по серии сопоставимых заданий.</p></article><article class="card full yellow"><h3>Рекомендация системы</h3><p style="font-size:1.15rem">Следующую тренировку начать с уровня «РАСПОЗНАЮ», затем дать 2 задания «ОБЪЯСНЯЮ». После двух самостоятельных успехов — перенос в короткий текст.</p><div class="actions"><button class="btn" data-route="creator">Создать персональный тренажёр</button><button class="btn secondary" data-route="class">Вернуться к классу</button></div></article></div>`)}
 
-function renderCreator(){page(`<p class="eyebrow">Учительский режим</p><h1>Создать персональный тренажёр</h1><div class="grid" style="margin-top:28px"><article class="card wide"><div class="form-grid"><div class="field"><label>Класс</label><select id="cClass"><option>6Б</option><option>6А</option><option>5В</option></select></div><div class="field"><label>Ученик / группа</label><select id="cStudent"><option>Илья Р.</option><option>4 ученика с зоной риска</option><option>Весь класс</option></select></div><div class="field"><label>Орфограмма</label><select id="cTopic">${orthograms.map(o=>`<option value="${o.id}">${o.title}</option>`).join('')}</select></div><div class="field"><label>Этап</label><select id="cStage"><option value="1">1 · Замечаю</option><option value="2">2 · Распознаю</option><option value="3" selected>3 · Объясняю</option><option value="4">4 · Применяю</option></select></div><div class="field"><label>Количество</label><select id="cCount"><option>5</option><option selected>7</option><option>10</option></select></div><div class="field"><label>Сложность</label><select id="cDifficulty"><option>поддерживающая</option><option selected>базовая</option><option>повышенная</option></select></div><div class="field"><label>Тип упражнения</label><select id="cType"><option>автоматически</option><option>найди опасное место</option><option>выбери алгоритм</option><option>редактор</option><option>смешанный вызов</option></select></div></div><div class="actions"><button class="btn blue" id="generateBtn">Сформировать вариант</button></div><div id="creatorPreview"></div></article><article class="card pink"><h3>Контроль учителя</h3><p>ИИ не публикует задание автоматически. Он предлагает вариант из утверждённых правил и шаблонов.</p><p><strong>Перед назначением:</strong> изменить формулировку, заменить пример, удалить задание, добавить своё, сгенерировать новый вариант.</p></article></div>`);$('#generateBtn').addEventListener('click',generatePreview)}
-function generatePreview(){const topic=$('#cTopic').value,stage=+$('#cStage').value;let pool=trainerBank.filter(x=>x.topic===topic&&Math.abs(x.stage-stage)<=1);if(pool.length<3)pool=[...pool,...trainerBank.filter(x=>x.topic===topic)];const chosen=pool.slice(0,3);$('#creatorPreview').innerHTML=`<div class="preview"><div class="tag">Предварительный просмотр · шаблонная генерация</div>${chosen.map((t,i)=>`<div class="preview-item"><strong>${i+1}. ${t.title}</strong><br>${t.prompt}<div class="actions" style="margin-top:8px"><button class="btn secondary small" type="button">Изменить</button><button class="btn secondary small" type="button">Заменить пример</button><button class="btn secondary small" type="button">Удалить</button></div></div>`).join('')}<label class="checkline" style="margin-top:16px"><input type="checkbox" id="teacherCheck"> <span><strong>Проверено учителем.</strong> Правила, ответы и формулировки просмотрены.</span></label><button class="btn blue" id="publishBtn" disabled style="margin-top:15px">Назначить тренажёр</button></div>`;$('#teacherCheck').addEventListener('change',e=>$('#publishBtn').disabled=!e.target.checked);$('#publishBtn').addEventListener('click',()=>showToast('Демо: тренажёр назначен.'))}
-
+function renderCreator(){page(`<p class="eyebrow">Учительский режим</p><h1>Создать персональный тренажёр</h1><div class="grid" style="margin-top:28px"><article class="card wide"><div class="form-grid"><div class="field"><label>Класс</label><select id="cClass"><option>6Б</option><option>6А</option><option>5В</option></select></div><div class="field"><label>Ученик / группа</label><select id="cStudent"><option>Илья Р.</option><option>4 ученика с зоной риска</option><option>Весь класс</option></select></div><div class="field"><label>Орфограмма</label><select id="cTopic">${orthograms.map(o=>`<option value="${o.id}">${o.title}</option>`).join('')}</select></div><div class="field"><label>Этап</label><select id="cStage"><option value="1">1 · Замечаю</option><option value="2">2 · Распознаю</option><option value="3" selected>3 · Объясняю</option><option value="4">4 · Применяю</option></select></div><div class="field"><label>Количество</label><select id="cCount"><option>5</option><option selected>7</option><option>10</option></select></div><div class="field"><label>Сложность</label><select id="cDifficulty"><option>поддерживающая</option><option selected>базовая</option><option>повышенная</option></select></div><div class="field"><label>Тип упражнения</label><select id="cType"><option>автоматически</option><option>найди опасное место</option><option>выбери алгоритм</option><option>редактор</option><option>смешанный вызов</option></select></div></div><div class="actions"><button class="btn blue" id="generateBtn">Сформировать вариант</button></div><div id="creatorPreview"></div></article><article class="card pink"><h3>Контроль учителя</h3><p>Демоверсия подбирает задания из подготовленного банка. Генеративный ИИ и реальная отправка ученикам не подключены. После проверки можно скачать редактируемый черновик.</p><p><strong>Перед назначением:</strong> изменить формулировку, заменить пример, удалить задание, добавить своё, сгенерировать новый вариант.</p></article></div>`);$('#generateBtn').addEventListener('click',generatePreview)}
+let creatorDraft=[];
+let creatorPool=[];
+const creatorEsc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+function generatePreview(){
+ const topic=$('#cTopic').value,stage=+$('#cStage').value;
+ const amount=+$('#cCount').value,level=$('#cDifficulty').value,type=$('#cType').value;
+ let target=stage+(level==='повышенная'?1:level==='поддерживающая'?-1:0);
+ target=Math.max(1,Math.min(4,target));
+ creatorPool=trainerBank.filter(t=>t.topic===topic).filter(t=>
+   type==='автоматически'||type==='смешанный вызов'||
+   (type==='найди опасное место'&&t.type==='spot')||
+   (type==='выбери алгоритм'&&t.type==='choice')||
+   (type==='редактор'&&t.type==='editor')
+ ).sort((a,b)=>Math.abs(a.stage-target)-Math.abs(b.stage-target));
+ if(!creatorPool.length){$('#creatorPreview').innerHTML='<p class="callout">Для такой комбинации нет проверяемых примеров. Выбери другой тип упражнения.</p>';return}
+ creatorDraft=Array.from({length:Math.min(amount,creatorPool.length)},(_,k)=>{
+   const t=creatorPool[k];
+   return {...t,prompt:String(t.prompt||'')+(t.word?' Слово: '+t.word+'.':'')+(t.text?' Текст: '+t.text:'')};
+ });
+ renderCreatorDraft();
+}
+function renderCreatorDraft(){
+ const preview=$('#creatorPreview');
+ if(!preview)return;
+ const count=creatorDraft.length;
+ preview.innerHTML='<div class="preview creator-atelier"><div class="tag">РЕДАКТОРСКИЙ ЧЕРНОВИК · '+count+' заданий · '+creatorPool.length+' доступно в банке</div>'+
+ creatorDraft.map((t,i)=>'<article class="preview-item creator-draft" data-index="'+i+'">'+
+  '<strong>Карточка '+(i+1)+'. '+creatorEsc(t.title)+'</strong>'+
+  '<div class="creator-draft-prompt">'+creatorEsc(t.prompt)+'</div>'+
+  (t.options?'<p class="micro">Варианты: '+creatorEsc(t.options.join(' / '))+'</p>':'')+
+  '<p class="micro">Ключ / объяснение: '+creatorEsc(t.explanation||t.expected||'Требует заполнения учителем')+'</p>'+
+  '<div class="creator-draft-editor" hidden><label>Формулировка задания<textarea class="text-input" data-creator-prompt="'+i+'" rows="3">'+creatorEsc(t.prompt)+'</textarea></label>'+
+  '<label>Ключ и объяснение<textarea class="text-input" data-creator-answer="'+i+'" rows="3">'+creatorEsc(t.explanation||t.expected||'')+'</textarea></label></div>'+
+  '<div class="actions" style="margin-top:9px"><button class="btn secondary small" data-creator-action="edit" data-index="'+i+'" type="button">Изменить</button>'+
+  '<button class="btn secondary small" data-creator-action="replace" data-index="'+i+'" type="button">Заменить пример</button>'+
+  '<button class="btn secondary small" data-creator-action="remove" data-index="'+i+'" type="button">Удалить</button></div></article>').join('')+
+ '<div class="actions"><button type="button" id="creatorAdd" class="btn secondary small">+ Добавить своё задание</button></div>'+
+ '<label class="checkline" style="margin-top:16px"><input type="checkbox" id="teacherCheck"><span><strong>Проверено учителем.</strong> Я изучил(а) формулировки и ключи каждого задания.</span></label>'+
+ '<button class="btn blue" id="publishBtn" disabled style="margin-top:15px">Скачать проверенный черновик (.txt)</button>'+
+ '<p class="micro">Задания не отправляются ученикам автоматически. Это локальный черновик, который можно отредактировать и скачать.</p></div>';
+ preview.querySelectorAll('[data-creator-action]').forEach(btn=>btn.onclick=()=>{
+  const idx=+btn.dataset.index;
+  if(btn.dataset.creatorAction==='edit'){
+   const ed=preview.querySelector('.creator-draft[data-index="'+idx+'"] .creator-draft-editor');ed.hidden=!ed.hidden;return;
+  }
+  if(btn.dataset.creatorAction==='remove'){creatorDraft.splice(idx,1);renderCreatorDraft();return}
+  if(btn.dataset.creatorAction==='replace'){
+   const unused=creatorPool.find(x=>!creatorDraft.some(y=>y.id===x.id));
+   if(!unused){showToast('В выбранной теме больше нет уникальных примеров.');return}
+   creatorDraft[idx]={...unused,prompt:String(unused.prompt||'')+(unused.word?' Слово: '+unused.word+'.':'')+(unused.text?' Текст: '+unused.text:'')};
+   renderCreatorDraft();
+  }
+ });
+ preview.querySelectorAll('[data-creator-prompt]').forEach(x=>x.oninput=()=>{creatorDraft[+x.dataset.creatorPrompt].prompt=x.value;const summary=x.closest('.creator-draft').querySelector('.creator-draft-prompt');summary.textContent=x.value});
+ preview.querySelectorAll('[data-creator-answer]').forEach(x=>x.oninput=()=>{creatorDraft[+x.dataset.creatorAnswer].explanation=x.value});
+ preview.querySelector('#creatorAdd').onclick=()=>{
+  creatorDraft.push({id:'manual-'+Date.now(),topic:$('#cTopic').value,title:'Авторское задание',prompt:'Введите формулировку задания.',explanation:'Введите обоснованный ответ.'});
+  renderCreatorDraft();
+  const ed=preview.querySelector('.creator-draft[data-index="'+(creatorDraft.length-1)+'"] .creator-draft-editor');
+  if(ed)ed.hidden=false;
+ };
+ preview.querySelector('#teacherCheck').onchange=e=>preview.querySelector('#publishBtn').disabled=!e.target.checked||!creatorDraft.length;
+ preview.querySelector('#publishBtn').onclick=()=>{
+  const title='ОрфоЗор AI — редакторский черновик ('+$('#cClass').value+', '+$('#cTopic').selectedOptions[0].text+')';
+  const lines=[title,'Кому: '+$('#cStudent').value,'Этап: '+$('#cStage').value,'Статус: подготовлено и проверено учителем','',
+  ...creatorDraft.flatMap((t,i)=>[(i+1)+'. '+t.title,t.prompt,t.options?'Варианты: '+t.options.join(' | '):'','Ключ / объяснение: '+(t.explanation||t.expected||'нужно заполнить'),''])];
+  const blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='orfozor_trainer_draft.txt';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+ };
+}
 function startTopicTraining(topic){
  const tasks=trainerBank.filter(t=>t.topic===topic);
  if(!tasks.length){showToast('Для этой орфограммы задания готовятся.');return;}
