@@ -1,0 +1,264 @@
+/*
+ * ORFOZOR AI • Literary Workshop / редакционный стандарт 2026.10
+ * The loved homepage (.reference-hero, .reference-entry) is deliberately unchanged.
+ * Meaningful material stays real, selectable HTML. No false portraits.
+ */
+#main .page:not(:has(.reference-hero)){
+ --blue:#95363E;--pink:#EBC2C9;--yellow:#F1D49B;
+ --paper:#F8F1E7;--ink:#2C2827;--line:#DCC8B7;--muted:#675C56;
+ --shadow:4px 7px 0 rgba(84,50,39,.055),0 16px 30px rgba(65,45,31,.06);
+ position:relative;isolation:isolate;
+ color:#302925;
+}
+#main .page:not(:has(.reference-hero))::before{
+ content:"";position:absolute;z-index:-1;pointer-events:none;inset:0 -50px 0;
+ background:
+ radial-gradient(circle at 1px 1px,rgba(111,85,64,.09) .6px,transparent .8px) 0 0/9px 9px,
+ linear-gradient(90deg,transparent 0%,rgba(163,59,68,.035) 50%,transparent 100%);
+ opacity:.8;
+}
+#main .page:not(:has(.reference-hero))>h1,
+#main .page:not(:has(.reference-hero)) .newgame-heading h1,
+#main .page:not(:has(.reference-hero)) .extended-library>h1,
+#main .page:not(:has(.reference-hero)) .sheet-layout~h1{
+ font:500 clamp(2.1rem,4.35vw,4.1rem)/1.09 Prata,Georgia,serif;
+ letter-spacing:-.065em;color:#6E2732;text-wrap:balance;
+}
+#main .page:not(:has(.reference-hero))>h1{
+ border-bottom:3px double #D1B9A6;padding-bottom:22px;margin-bottom:22px;
+}
+#main .page:not(:has(.reference-hero))>h1::after{
+ content:"ОрфоЗор / лаборатория русского слова";display:block;font:800 .6rem/1.6 "Golos Text",sans-serif;
+ letter-spacing:.16em;text-transform:uppercase;color:#987568;margin-top:18px;
+}
+#main .page:not(:has(.reference-hero)) .eyebrow{font-size:.64rem;letter-spacing:.19em;color:#9C4A51;font-weight:850}
+#main .page:not(:has(.reference-hero)) .section-intro{line-height:1.75;color:#64564F;max-width:740px}
+#main .page:not(:has(.reference-hero)) h2,
+#main .page:not(:has(.reference-hero)) .card h3,
+#main .page:not(:has(.reference-hero)) .orth-head strong,
+#main .page:not(:has(.reference-hero)) .game-card h3{
+ color:inherit;
+}
+#main .page:not(:has(.reference-hero)) .section h2{
+ font:500 clamp(1.65rem,3vw,2.8rem)/1.2 Literata,Georgia,serif;letter-spacing:-.045em;
+}
+#main .page:not(:has(.reference-hero)) .card,
+#main .page:not(:has(.reference-hero)) .orth-item,
+#main .page:not(:has(.reference-hero)) .sheet-panel,
+#main .page:not(:has(.reference-hero)) .task-card,
+#main .page:not(:has(.reference-hero)) .game-card,
+#main .page:not(:has(.reference-hero)) .game-play-card{
+ background-color:#FFFAF2;border:1px solid #D6BEAD;border-radius:2px;
+ box-shadow:4px 6px 0 rgba(94,56,38,.08);position:relative;
+}
+#main .page:not(:has(.reference-hero)) .card::before,
+#main .page:not(:has(.reference-hero)) .sheet-panel::before,
+#main .page:not(:has(.reference-hero)) .game-card::after{
+ content:"";position:absolute;top:-6px;left:22%;width:75px;height:17px;z-index:1;pointer-events:none;
+ border:1px solid rgba(134,98,66,.1);
+ background:rgba(206,172,131,.32);transform:rotate(-5deg);
+}
+#main .page:not(:has(.reference-hero)) .card:nth-child(2n)::before{transform:rotate(5deg);left:55%}
+#main .page:not(:has(.reference-hero)) .card::after{background:rgba(198,160,120,.2)}
+#main .page:not(:has(.reference-hero)) .card.blue{
+ background:#43516A;color:#FFF6ED;border-color:#43516A;
+}
+#main .page:not(:has(.reference-hero)) .card.blue *{color:inherit}
+#main .page:not(:has(.reference-hero)) .card.yellow{background:#F3E2C0;color:#382B28}
+#main .page:not(:has(.reference-hero)) .card.pink{background:#F3D8D7;color:#382B28}
+#main .page:not(:has(.reference-hero)) .metric{
+ font-family:Literata,Georgia,serif;letter-spacing:-.055em;
+}
+#main .page:not(:has(.reference-hero)) .btn.blue,
+#main .page:not(:has(.reference-hero)) .btn:not(.secondary):not(.yellow){
+ background:#8E303C;border-color:#8E303C;color:white;
+}
+#main .page:not(:has(.reference-hero)) .btn.yellow{background:#E9C579;border-color:#E9C579;color:#362F26}
+#main .page:not(:has(.reference-hero)) .btn.secondary{background:#FFF9F1;border-color:#C4A997;color:#55403B}
+#main .page:not(:has(.reference-hero)) .btn:hover{box-shadow:4px 5px 0 rgba(91,47,44,.13)}
+#main .page:not(:has(.reference-hero)) .subnav{
+ border-bottom:1px solid #C8B19F;padding-bottom:14px;margin-bottom:28px;
+}
+#main .page:not(:has(.reference-hero)) .subnav button{
+ background:#F5EBDD;border:1px solid #CDB7A3;color:#624540;border-radius:3px;
+ box-shadow:2px 3px 0 rgba(95,62,44,.05);
+}
+#main .page:not(:has(.reference-hero)) .pill{border-color:#C8AA93;background:#F6EADB;color:#6A4141}
+#main .page:not(:has(.reference-hero)) .pill.blue{color:#fff;background:#475E76}
+#main .page:not(:has(.reference-hero)) .pill.yellow{background:#F0D49A}
+#main .page:not(:has(.reference-hero)) .bar,#main .page:not(:has(.reference-hero)) .progress{border-color:#BCA795}
+#main .page:not(:has(.reference-hero)) .progress>span{background:#A74954}
+#main .page:not(:has(.reference-hero)) .bar>span{background:#A74954}
+#main .page:not(:has(.reference-hero)) .table-wrap{
+ border:1px solid #C5AB98;border-radius:0;background:#FFF8EE;
+}
+#main .page:not(:has(.reference-hero)) .data-table th{background:#EEDFCC;color:#653239;font-weight:850}
+#main .page:not(:has(.reference-hero)) .data-table tr:nth-child(even){background:#F7EFE6}
+#main .page:not(:has(.reference-hero)) .callout{
+ border-left:5px solid #A44951;background:#F5E6D7;color:#584137;border-radius:0;
+}
+#main .page:not(:has(.reference-hero)) .stage{
+ border-radius:2px;border-color:#D0B7A5;background:#FCF6ED;box-shadow:3px 4px 0 rgba(84,55,34,.05);
+}
+#main .page:not(:has(.reference-hero)) .stage.current{background:#F1D9B8}
+#main .page:not(:has(.reference-hero)) .stage.done{background:#556C72;color:#fff}
+#main .page:not(:has(.reference-hero)) .task-shell .task-type{color:#903D46;font-weight:800}
+#main .page:not(:has(.reference-hero)) .task-shell .task-card{
+ background-image:radial-gradient(circle at 1px 1px,rgba(104,79,62,.045) .8px,transparent 1px);
+ background-size:8px 8px;
+}
+#main .page:not(:has(.reference-hero)) .task-card::before{
+ content:"КАРТОТЕКА / ОРФОГРАФИЯ";display:block;font:800 .62rem/1.5 "Golos Text",sans-serif;
+ letter-spacing:.15em;color:#9A5053;padding-bottom:13px;margin-bottom:17px;border-bottom:1px solid #DEC9B7;
+}
+#main .page:not(:has(.reference-hero)) .orth-item{
+ overflow:visible;border-left:7px solid #984351;clip-path:none;
+}
+#main .page:not(:has(.reference-hero)) .orth-item:nth-child(3n+2){border-left-color:#788B85;background:#FCF9F1}
+#main .page:not(:has(.reference-hero)) .orth-item:nth-child(3n){border-left-color:#C79B58;background:#F8F0E5}
+#main .page:not(:has(.reference-hero)) .orth-item::before{display:none}
+#main .page:not(:has(.reference-hero)) .orth-head{
+ position:relative;isolation:isolate;min-height:76px;padding-right:16px;
+}
+#main .page:not(:has(.reference-hero)) .orth-head::after{
+ content:"СЛОВО • ПРАВИЛО • СМЫСЛ";position:absolute;right:48px;top:12px;opacity:.34;pointer-events:none;
+ font:800 .46rem/1.5 "Golos Text",sans-serif;letter-spacing:.16em;color:#824C48;
+}
+#main .page:not(:has(.reference-hero)) .orth-item.open .orth-head{background:#EEDFCC}
+#main .page:not(:has(.reference-hero)) .orth-head strong{font:600 1.25rem/1.3 Literata,Georgia,serif;color:#532F32}
+#main .page:not(:has(.reference-hero)) .orth-body{background:linear-gradient(180deg,#FFF9F1,#FFFDF9);padding-bottom:23px}
+#main .page:not(:has(.reference-hero)) .orth-note{border:0;border-left:3px solid #C48C7B}
+#main .page:not(:has(.reference-hero)) .orth-examples{margin-top:22px}
+#main .page:not(:has(.reference-hero)) .orth-chip{border-color:#DDC3AD;box-shadow:2px 3px 0 rgba(104,59,41,.05)}
+#main .page:not(:has(.reference-hero)) .sheet-panel{
+ border-top:5px solid #99404D;background:#FFF9F1;
+}
+#main .page:not(:has(.reference-hero)) .sheet-panel h2{color:#752C36}
+#main .page:not(:has(.reference-hero)) .topic-check{background:#F4E9DA;border-color:#D9BFA9;border-radius:2px}
+#main .page:not(:has(.reference-hero)) .sheet-edit{background:#FFFDF7;border-radius:0;border-color:#D6C2B1}
+#main .page:not(:has(.reference-hero)) .sheet-empty{background:#EFE6D8;border-radius:0}
+#main .page:not(:has(.reference-hero)) .paper-art{
+ background:linear-gradient(125deg,rgba(245,229,208,.90),rgba(245,229,208,.40)),var(--art-books) center/cover;
+ border:1px solid #DAC3AF;border-radius:0;min-height:180px;
+}
+#main .page:not(:has(.reference-hero)) .paper-art>span{color:#7A3740;text-shadow:1px 1px #FFF9F0}
+#main .page:not(:has(.reference-hero)) .game-card{
+ min-height:230px;background:#F7EBDD;overflow:hidden;
+}
+#main .page:not(:has(.reference-hero)) .game-card:nth-child(2){background:#F0DED7}
+#main .page:not(:has(.reference-hero)) .game-card:nth-child(3){background:#DDE8EE}
+#main .page:not(:has(.reference-hero)) .game-card:nth-child(4){background:#E2DDD6}
+#main .page:not(:has(.reference-hero)) .game-card .game-icon{
+ background:#FFF9ED;border-radius:2px;transform:rotate(-4deg);
+}
+#main .page:not(:has(.reference-hero)) .game-play,
+#main .page:not(:has(.reference-hero)) .newgame{
+ position:relative;
+}
+#main .page:not(:has(.reference-hero)) .newgame-heading{
+ position:relative;overflow:hidden;background:#F7EBDD;border:1px solid #E0CBB6;padding:24px;
+ min-height:195px;
+}
+#main .page:not(:has(.reference-hero)) .newgame-heading>div:first-child{max-width:720px;position:relative;z-index:2}
+#main .page:not(:has(.reference-hero)) .newgame-heading::after{
+ content:"";position:absolute;inset:auto 0 0 auto;width:min(40%,330px);height:100%;opacity:.22;
+ background:var(--art-books) center/cover no-repeat;mask-image:linear-gradient(90deg,transparent,#000 45%);
+ pointer-events:none;
+}
+#main .page:not(:has(.reference-hero)) .game-mode-hunt .newgame-heading::after{background-image:var(--art-hunt)}
+#main .page:not(:has(.reference-hero)) .game-mode-editor .newgame-heading::after{background-image:var(--art-editor)}
+#main .page:not(:has(.reference-hero)) .game-mode-build .newgame-heading::after{background-image:var(--art-build)}
+#main .page:not(:has(.reference-hero)) .game-mode-detective .newgame-heading::after{background-image:var(--art-detective)}
+#main .page:not(:has(.reference-hero)) .newgame-heading h1{
+ font:500 clamp(2.1rem,4.4vw,4rem)/1.1 Prata,Georgia,serif;letter-spacing:-.06em;color:#6C2934;
+}
+#main .page:not(:has(.reference-hero)) .newgame-paper{
+ background:
+ radial-gradient(circle at 1px 1px,rgba(90,60,42,.065) .7px,transparent .9px) 0 0/8px 8px,
+ linear-gradient(135deg,#FFF9F0,#F8F0E5);
+ box-shadow:7px 9px 0 rgba(89,60,48,.08);
+}
+#main .page:not(:has(.reference-hero)) .newgame-top{
+ font:800 .62rem/1.6 "Golos Text",sans-serif;letter-spacing:.16em;color:#934047;
+}
+#main .page:not(:has(.reference-hero)) .newgame-paper>h2{
+ font:500 clamp(1.35rem,2.7vw,2.25rem)/1.32 Literata,Georgia,serif;color:#3B3230;
+}
+#main .page:not(:has(.reference-hero)) .detective-case{
+ border:1px solid #B8947E;box-shadow:4px 6px 0 rgba(95,55,37,.09);
+ background:
+ linear-gradient(90deg,rgba(248,237,217,.98) 56%,rgba(248,237,217,.83) 100%),
+ var(--art-detective) right center/auto 100% no-repeat;
+}
+#main .page:not(:has(.reference-hero)) .constructor-view{
+ background:#E8E1D4;border:1px dashed #B49B88;
+}
+#main .page:not(:has(.reference-hero)) .constructor-tiles .constructor-tile{border-radius:2px}
+#main .page:not(:has(.reference-hero)) .editor-newspaper.newspaper-authentic{
+ transform:rotate(-.15deg);border-color:#8E8476;
+}
+#main .page:not(:has(.reference-hero)) .news-engraving-art{
+ font-size:0!important;
+ background:linear-gradient(180deg,rgba(239,232,215,.06),rgba(54,44,35,.1)),var(--art-skyline) center/cover no-repeat!important;
+ filter:grayscale(1) sepia(.24);min-height:132px;
+}
+#main .page:not(:has(.reference-hero)) .news-pullquote{font-size:clamp(1rem,2vw,1.3rem)}
+#main .page:not(:has(.reference-hero)) .correction-desk{
+ box-shadow:6px 9px 0 rgba(107,73,52,.08);background:linear-gradient(160deg,#FFF9ED,#F7ECDD);
+}
+#main .page:not(:has(.reference-hero)) .game-note.retry{
+ border-color:#A2464D;background:#F9E8E1;
+}
+#main .page:not(:has(.reference-hero)) .game-note.success{
+ background:#E6EDDF;border-color:#5D8267;
+}
+#main .page:not(:has(.reference-hero)) .authors-lab{
+ background:
+ linear-gradient(90deg,rgba(247,236,219,.96) 0 65%,rgba(247,236,219,.82)),
+ var(--art-books) right/auto 100% no-repeat;
+ border-color:#D6BAA5;
+}
+#main .page:not(:has(.reference-hero)) .author-paper{
+ box-shadow:6px 7px 0 rgba(107,70,43,.065);
+}
+#main .page:not(:has(.reference-hero)) .footer-note{
+ background:#F4E7D8;border-top:2px solid #D8BDAC;padding:17px 20px;margin-top:72px;
+ font:italic .85rem/1.65 Literata,Georgia,serif;color:#755B50;
+}
+#main .page:not(:has(.reference-hero)) .quality-editorial-note{
+ position:relative;padding:20px 23px;margin-top:25px;border-left:5px solid #A4434C;
+ background:#FAF2E8;box-shadow:3px 5px 0 rgba(84,52,33,.07);
+}
+#main .page:not(:has(.reference-hero)) .quality-editorial-note h3{
+ font:600 1.23rem Literata,Georgia,serif;margin:0 0 9px;
+}
+#main .page:not(:has(.reference-hero)) .quality-editorial-note p{margin:0;line-height:1.7}
+#main .page:not(:has(.reference-hero)) .quality-editorial-note::before{
+ content:"ОТ РЕДАКЦИИ";display:block;font:800 .61rem/1.5 "Golos Text",sans-serif;
+ letter-spacing:.17em;color:#AA5152;margin-bottom:9px;
+}
+@media(max-width:960px){
+ #main .page:not(:has(.reference-hero)) .newgame-heading::after{width:32%;opacity:.15}
+ #main .page:not(:has(.reference-hero)) .authors-lab{background:#F7EBDD}
+}
+@media(max-width:620px){
+ #main .page:not(:has(.reference-hero))>h1{font-size:clamp(2rem,9vw,3.1rem)}
+ #main .page:not(:has(.reference-hero)) .newgame-heading{padding:16px;min-height:0}
+ #main .page:not(:has(.reference-hero)) .newgame-heading::after{display:none}
+ #main .page:not(:has(.reference-hero)) .newgame-paper{padding:18px 15px}
+ #main .page:not(:has(.reference-hero)) .orth-head::after{display:none}
+ #main .page:not(:has(.reference-hero)) .orth-chip{max-width:100%;overflow-wrap:anywhere}
+ #main .page:not(:has(.reference-hero)) .game-card{min-height:0}
+}
+@media(prefers-reduced-motion:reduce){
+ #main .page:not(:has(.reference-hero)) *{scroll-behavior:auto!important;animation-duration:.01ms!important}
+}
+@media print{
+ #main .page:not(:has(.reference-hero)){background:#fff!important;color:#111!important}
+ #main .page:not(:has(.reference-hero))::before,
+ #main .page:not(:has(.reference-hero)) .card::before,
+ #main .page:not(:has(.reference-hero)) .game-card::after{display:none!important}
+ #main .page:not(:has(.reference-hero)) .card,
+ #main .page:not(:has(.reference-hero)) .task-card,
+ #main .page:not(:has(.reference-hero)) .sheet-panel{box-shadow:none!important}
+}
