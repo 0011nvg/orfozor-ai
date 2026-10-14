@@ -262,3 +262,40 @@
  #main .page:not(:has(.reference-hero)) .task-card,
  #main .page:not(:has(.reference-hero)) .sheet-panel{box-shadow:none!important}
 }
+
+/* Live newspaper editing: all printed words remain equal until pupil selects one. */
+#main .page:not(:has(.reference-hero)) .news-copy-to-edit .proof-word{
+ display:inline;background:transparent;box-shadow:none;color:inherit;border:0;border-radius:0;
+ padding:0 .02em;margin:0;vertical-align:baseline;font:inherit;line-height:inherit;
+ text-align:inherit;letter-spacing:inherit;cursor:text;
+}
+#main .page:not(:has(.reference-hero)) .news-copy-to-edit .proof-word:hover,
+#main .page:not(:has(.reference-hero)) .news-copy-to-edit .proof-word:focus-visible{
+ color:#772C34;text-decoration:underline wavy #B8535D .09em;text-underline-offset:.16em;
+ background:rgba(220,177,170,.23);cursor:pointer;outline-offset:1px;
+}
+#main .page:not(:has(.reference-hero)) .news-copy-to-edit .proof-word.proof-selected{
+ background:#F0C8C8;text-decoration:underline solid #A5434C;text-underline-offset:3px;
+ color:#633238;
+}
+#main .page:not(:has(.reference-hero)) .news-copy-to-edit:before{content:"ЛИТЕРАТУРНЫЙ КОРРЕКТОР / ВЫДЕЛИ СЛОВО"}
+#main .page:not(:has(.reference-hero)) .editor-newspaper.newspaper-authentic .news-nameplate{
+ border-bottom:1px solid #5B5348;margin-bottom:0;
+}
+#main .page:not(:has(.reference-hero)) .editor-newspaper.newspaper-authentic .news-story-grid{
+ column-rule:1px solid #A6A093;
+}
+#main .page:not(:has(.reference-hero)) .newgame .correction-desk{
+ position:relative;isolation:isolate;
+}
+#main .page:not(:has(.reference-hero)) .correction-desk:after{
+ content:"ПРОВЕРЕНО РЕДАКЦИЕЙ";
+ position:absolute;bottom:12px;right:13px;z-index:-1;pointer-events:none;
+ font:800 .52rem/1.4 "Golos Text",sans-serif;letter-spacing:.12em;
+ color:rgba(137,85,72,.19);transform:rotate(-7deg);
+}
+@media (max-width:650px){
+ #main .page:not(:has(.reference-hero)) .news-copy-to-edit .proof-word{
+  line-height:1.75;padding:0 1px;min-height:25px;
+ }
+}
