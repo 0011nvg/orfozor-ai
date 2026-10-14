@@ -1,0 +1,94 @@
+
+/* ORFOZOR • literary scrapbook expansion, 2026.10 */
+.authors-lab{position:relative;margin:70px 0 26px;padding:38px clamp(18px,4vw,50px);background:#f6e9d8;border:1px solid #e0cbbb;box-shadow:7px 9px 0 rgba(112,74,59,.09);isolation:isolate}
+.authors-lab:before{content:"";position:absolute;top:-10px;left:18%;width:80px;height:20px;transform:rotate(-5deg);background:rgba(191,160,124,.35)}
+.authors-lab h2{font-family:Literata,Georgia,serif;color:#622e35;font-size:clamp(1.8rem,4vw,3rem);letter-spacing:-.06em;margin:9px 0 24px}
+.authors-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.author-paper{padding:24px;background:#fffaf2;box-shadow:4px 5px 0 rgba(65,50,38,.08);border:1px solid #e5d1bf;transform:rotate(-.45deg)}
+.author-paper:nth-child(2){background:#ebebe7;transform:rotate(.55deg)}
+.author-paper h3{font:600 clamp(1.25rem,2vw,1.55rem)/1.3 Literata,Georgia,serif;color:#392a2b;margin:17px 0 12px}
+.author-paper p{line-height:1.65;font-size:.9rem;color:#574c43}
+.author-number{display:inline-block;font-size:.65rem;letter-spacing:.15em;font-weight:800;color:#a0484a;border-bottom:1px solid #b98c7d;padding-bottom:8px}
+.author-source{font-size:.79rem!important}.author-source a{color:#a13b42;text-decoration:underline}
+.extended-library .library-toolbar{max-width:650px;margin:24px 0 28px;padding:20px 21px 22px;background:#f0e4d8;border-left:6px solid #9d3f43;box-shadow:4px 4px 0 rgba(81,66,56,.07)}
+.library-toolbar label{display:block;font-size:.79rem;font-weight:750;letter-spacing:.03em;margin-bottom:9px}
+.library-toolbar input{width:100%}
+.extended-library .orth-item[hidden]{display:none!important}
+.extended-library .orth-item{border-radius:3px;background:#fff9f0}
+.extended-library .orth-item:nth-child(3n+2){background:#f2eee7}
+.extended-library .orth-head{cursor:pointer}
+.extended-library .orth-body h3{margin:18px 0 12px;font:600 1.13rem Literata,Georgia,serif}
+.orth-examples{display:flex;flex-wrap:wrap;gap:8px;margin:15px 0}
+.orth-chip{display:inline-flex;max-width:100%;padding:6px 11px;white-space:normal;font:.85rem/1.3 "Golos Text",sans-serif;color:#503e35;background:#f3e2d0;border:1px solid #debb9d;box-shadow:2px 2px 0 rgba(121,65,55,.07)}
+.orth-note-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.orth-note{background:#faf2e6;padding:13px;border:1px dashed #d2ad9c}
+.orth-note:nth-child(3n){background:#e9ebdf}.orth-note strong{font:600 1.01rem Literata,Georgia,serif}
+.orth-note p{font-size:.8rem;line-height:1.55;color:#564a45;margin:7px 0 0}
+.newgame{max-width:1040px;margin:0 auto}
+.newgame-heading{display:flex;justify-content:space-between;gap:25px;align-items:center;margin-bottom:18px}
+.newgame-heading h1{margin:3px 0 6px;color:#702f38;font:600 clamp(2.2rem,5vw,3.8rem)/1.1 Literata,Georgia,serif}
+.newgame-heading p{max-width:660px;font-size:.96rem;line-height:1.65;color:#685a54}
+.newgame-count{display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;background:#f0ddd0;padding:12px 22px;transform:rotate(4deg);border:1px solid #d1ae9d;box-shadow:4px 6px 0 rgba(76,41,29,.09)}
+.newgame-count strong{font:700 2.6rem/1 Literata,Georgia,serif;color:#7e4149}
+.newgame-count span{font-size:.75rem;font-weight:750}
+.newgame-progress{height:8px;background:#eaded3;margin-bottom:24px;border:1px solid #d4bdab;overflow:hidden}
+.newgame-progress>div{height:100%;background:linear-gradient(90deg,#9c4254,#d6a76e);transition:width .35s ease}
+.newgame-paper{position:relative;padding:clamp(18px,4vw,42px);background-color:#fffaf2;border:1px solid #d8c4b4;box-shadow:8px 10px 0 rgba(91,58,48,.1);clip-path:polygon(0 0,98.8% .4%,100% 99.1%,.4% 100%);margin-bottom:30px}
+.newgame-paper:before{content:"";position:absolute;width:102px;height:25px;top:-5px;left:43%;transform:rotate(-4deg);background:#e3cab0b8;pointer-events:none}
+.newgame-paper:after{content:"";position:absolute;top:0;bottom:0;left:19px;border-left:1px solid rgba(155,104,95,.13);pointer-events:none}
+.newgame-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-size:.62rem;font-weight:750;letter-spacing:.15em;color:#a45956;border-bottom:1px solid #e3d3c6;padding:0 0 14px}
+.newgame-paper h2{margin:19px 0;font:600 clamp(1.35rem,2.5vw,2rem)/1.22 Literata,Georgia,serif;letter-spacing:-.03em;color:#362d30}
+.game-instruction{font-size:.92rem;line-height:1.65;color:#5d524b;margin:15px 0 23px}
+.hunt-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.hunt-item{display:flex;flex-direction:column;min-height:126px;gap:8px;padding:17px 13px 14px;background:#f3e8dc;border:1px solid #dbbeac;transition:transform .2s ease}
+.hunt-item:nth-child(3n+2){background:#edf0e9}.hunt-item:nth-child(3n){background:#f1e5e9}
+.hunt-item:focus-within{outline:2px solid #8c3c49;outline-offset:2px;transform:translateY(-2px)}
+.hunt-number{font-size:.59rem;font-weight:800;color:#886f6a;letter-spacing:.15em}
+.hunt-spelling{display:flex;align-items:center;flex-wrap:wrap;font:600 clamp(1.04rem,2.15vw,1.44rem)/1.35 Literata,Georgia,serif;color:#3d3133;overflow-wrap:anywhere}
+.hunt-letter{display:inline-block;width:43px;min-width:43px;height:39px;padding:3px 2px;margin:0 2px;border:0;border-bottom:3px solid #9a454b;border-radius:1px;background:#fffefa;color:#6d2735;text-align:center;font:750 1.25rem/1 "Golos Text",sans-serif;outline-offset:3px}
+.hunt-letter.wrong,.editor-correction.wrong{border-color:#b62e38!important;background:#fce5e1}
+.hunt-letter.right,.editor-correction.right{border-color:#45845a!important;background:#e4f1e5}
+.hunt-feedback{font-size:.75rem;line-height:1.48;display:block}
+.hunt-feedback.right{color:#356644}.hunt-feedback.wrong{color:#9a353b}
+.editor-newspaper{margin:18px 0 18px;padding:25px clamp(15px,2vw,27px);background:#f5efe6;border-left:7px solid #ae444c;box-shadow:4px 6px 0 rgba(82,53,45,.08);transform:rotate(-.45deg)}
+.newspaper-masthead{display:block;border-bottom:3px double #a47a6f;padding-bottom:9px;font-size:.65rem;letter-spacing:.16em;font-weight:900;color:#753a40}
+.editor-newspaper h3{font:600 1.3rem Literata,Georgia,serif;margin:12px 0 9px}
+.editor-newspaper p{font:400 1.11rem/1.8 Literata,Georgia,serif;color:#3b3532}
+.editor-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.editor-fields label{display:flex;flex-direction:column;gap:7px;font-weight:750;font-size:.85rem;color:#654f46}
+.editor-correction{width:100%;min-width:0}
+.editor-msg{font-size:.74rem;line-height:1.6;font-weight:450;color:#9a393c}
+.editor-msg.right{color:#306c44}
+.constructor-view{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:3px;margin:24px auto;min-height:124px;padding:12px;background:#efe6d5;border:1px dashed #b69d89;box-shadow:inset 0 2px 12px rgba(70,48,34,.06);font:600 clamp(1.4rem,4.2vw,2.7rem)/1.2 Literata,Georgia,serif;color:#403235}
+.constructor-slot{min-width:52px;min-height:59px;padding:7px 12px;display:grid;place-items:center;background:#fff9ea;box-shadow:3px 4px 0 #d2b9a3;border:2px solid #b56868;color:#903d48;transform:rotate(3deg)}
+.constructor-tiles{display:flex;flex-wrap:wrap;justify-content:center;gap:13px}
+.constructor-tile{min-width:77px;padding:16px;background:#f7dfb2;border:1px solid #c9a376;box-shadow:3px 5px 0 rgba(83,55,37,.13);font:700 1.5rem/1 Literata,Georgia,serif;cursor:pointer;transition:transform .17s ease,box-shadow .17s ease}
+.constructor-tile:nth-child(2){background:#eed9dc;transform:rotate(2deg)}
+.constructor-tile:nth-child(3){background:#dbe4d5;transform:rotate(-2deg)}
+.constructor-tile:hover,.constructor-tile.selected{transform:translateY(-4px) rotate(0);box-shadow:4px 8px 0 rgba(83,55,37,.18)}
+.constructor-tile.selected{outline:2px solid #944149;outline-offset:3px}
+.constructor-status{text-align:center;font-size:.78rem;color:#77675b;margin:14px 0 6px}
+@keyframes tileSnap{0%{transform:translateY(-28px) scale(.9) rotate(-10deg);opacity:.4}65%{transform:translateY(5px) scale(1.07) rotate(4deg);opacity:1}100%{transform:translateY(0) scale(1) rotate(3deg);opacity:1}}
+.tile-snap{animation:tileSnap .48s cubic-bezier(.2,.9,.28,1.2) both}
+@keyframes wordCelebrate{0%{background:#efe6d5;transform:scale(1)}40%{background:#e4efdb;transform:scale(1.02)}100%{background:#e4efdb;transform:scale(1)}}
+.constructor-view.game-solved{animation:wordCelebrate .75s ease both}
+.detective-case{background:#f0e0d0;padding:26px;border:1px dashed #bd9783;position:relative}
+.detective-case:after{content:"УЧЕБНОЕ ДЕЛО";position:absolute;right:12px;top:10px;color:#b87977;border:2px solid #b87977;padding:5px;font-size:.5rem;letter-spacing:.17em;transform:rotate(8deg)}
+.case-stamp{display:block;font-size:.62rem;font-weight:850;letter-spacing:.15em;color:#7e3843;margin-bottom:13px}
+.detective-case p{font:500 clamp(1.1rem,2.4vw,1.5rem)/1.53 Literata,Georgia,serif;max-width:780px;color:#403335}
+.newgame .game-choice-list{margin:19px 0;display:grid;gap:12px}
+.detective-answer{display:block;text-align:left;padding:16px 19px;border:1px solid #d6b8a5;background:#fffaf4;color:#342c29;font:600 .96rem/1.5 "Golos Text",sans-serif;cursor:pointer}
+.detective-answer:hover,.detective-answer.selected{background:#eadcce;border-color:#a2605e}
+.detective-answer.selected{outline:2px solid #9d4657;outline-offset:2px}
+.game-note{display:none;font-size:.89rem;line-height:1.7;padding:17px;margin:23px 0 17px;border-left:5px solid #b38064;background:#f3e6d7}
+.game-note.hint,.game-note.retry,.game-note.success{display:block}
+.game-note.retry{background:#fbe6df;border-color:#b2464c}
+.game-note.success{background:#e6efe1;border-color:#63896c}
+.game-controls{display:flex;flex-wrap:wrap;gap:12px;justify-content:flex-end;margin-top:22px}
+.game-finished{padding:30px;border:1px solid #d6bfaa;background:#f4e4d2;box-shadow:6px 9px 0 rgba(80,52,38,.09);margin:28px 0}
+.game-finished-mark{font-size:3rem;color:#ae4751}.game-finished h2{font:600 1.8rem Literata,Georgia,serif;margin:8px 0}
+.game-finished p{max-width:700px;line-height:1.7}
+@media(max-width:850px){.editor-fields{grid-template-columns:1fr}.authors-grid{grid-template-columns:1fr}.newgame-heading{align-items:flex-start}}
+@media(max-width:650px){.newgame-paper{padding:18px 16px;clip-path:none}.newgame-paper:after{left:7px}.newgame-heading{flex-direction:column;gap:10px}.newgame-count{align-self:flex-end;margin-top:-10px}.hunt-grid{grid-template-columns:1fr}.hunt-item{min-height:100px}.orth-note-grid{grid-template-columns:1fr}.authors-lab{padding:20px 14px}.author-paper{padding:20px}.editor-newspaper{padding:19px 13px}.editor-newspaper p{font-size:1rem}.constructor-tiles{gap:9px}.constructor-tile{min-width:66px;padding:13px}.game-controls{justify-content:stretch}.game-controls button{flex:1}}
+@media(prefers-reduced-motion:reduce){.tile-snap,.constructor-view.game-solved{animation:none!important}.constructor-tile,.hunt-item,.newgame-progress>div{transition:none!important}}
+@media print{.newgame .btn,.authors-lab:before,.game-controls{display:none!important}.newgame-paper{box-shadow:none!important;clip-path:none!important}}
