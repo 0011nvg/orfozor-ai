@@ -19,7 +19,7 @@ const orthograms = [
   {id:'oe', title:'Соединительные О/Е', source:'Узорова, Нефёдова, 6 класс: упражнения 102–111', rule:'В сложных словах после твёрдых согласных пишется соединительная О, после мягких согласных, шипящих и Ц — Е.', examples:['паровоз','землемер'], skills:['найти границу основ','определить конечный согласный первой основы','выбрать О/Е']},
   {"id": "chik", "title": "-ЧИК- / -ЩИК-", "source": "Узорова—Нефёдова: суффиксы существительных -ЧИК-/-ЩИК-", "rule": "После д, т, з, с, ж перед суффиксом лица пишется -чик-, в других случаях обычно -щик-.", "examples": ["переводчик", "каменщик"], "skills": ["заметить опасную позицию", "распознать морфему или условие", "объяснить написание", "применить в контексте"]},
   {"id": "ekik", "title": "-ЕК- / -ИК-", "source": "Узорова—Нефёдова: суффиксы существительных -ЕК-/-ИК-", "rule": "Если при изменении формы слова гласная суффикса выпадает, пишется -ек-; если сохраняется — -ик-.", "examples": ["замочек", "ключик"], "skills": ["заметить опасную позицию", "распознать морфему или условие", "объяснить написание", "применить в контексте"]},
-  {"id": "nne", "title": "Н / НН в прилагательных", "source": "Узорова—Нефёдова: одна и две Н в суффиксах прилагательных", "rule": "В прилагательных с суффиксами -онн-, -енн- пишется НН; в -ан-, -ян-, -ин- обычно одна Н. Учитывай исключения.", "examples": ["деревянный", "глиняный"], "skills": ["заметить опасную позицию", "распознать морфему или условие", "объяснить написание", "применить в контексте"]},
+  {"id": "nne", "title": "Н / НН в прилагательных", "source": "Узорова—Нефёдова: одна и две Н в суффиксах прилагательных", "rule": "В отымённых прилагательных НН пишется в суффиксах -онн-, -енн- (традиционный, жизненный), а также при добавлении суффикса -н- к основе на Н (длина → длинный; осень → осенний). В суффиксах -ан-, -ян-, -ин- обычно одна Н (кожаный, глиняный, гусиный). Исключения: стеклянный, оловянный, деревянный. Краткая форма сохраняет число Н полной: длинный — длинна.", "examples": ["деревянный", "глиняный"], "skills": ["заметить опасную позицию", "распознать морфему или условие", "объяснить написание", "применить в контексте"]},
   {"id": "imper", "title": "Ь в повелительном наклонении", "source": "Узорова—Нефёдова: мягкий знак в повелительном наклонении", "rule": "В повелительном наклонении после мягких согласных и шипящих на конце глагола пишется Ь; он сохраняется перед -ся и -те.", "examples": ["отрежь", "отрежьте"], "skills": ["заметить опасную позицию", "распознать морфему или условие", "объяснить написание", "применить в контексте"]},
   {"id": "verbs", "title": "-ОВА-/-ЕВА- и -ЫВА-/-ИВА-", "source": "Узорова—Нефёдова: гласные в суффиксах глаголов", "rule": "Форма на -ую/-юю помогает выбрать -ова-/-ева-, форма на -ываю/-иваю — -ыва-/-ива-.", "examples": ["советовать", "опаздывать"], "skills": ["заметить опасную позицию", "распознать морфему или условие", "объяснить написание", "применить в контексте"]},
   {"id": "hyphen", "title": "Дефис в местоимениях", "source": "Узорова—Нефёдова: дефис в неопределённых местоимениях", "rule": "Неопределённые местоимения с кое-, -то, -либо, -нибудь пишутся через дефис; при предлоге после кое слова пишутся раздельно.", "examples": ["кто-нибудь", "кое с кем"], "skills": ["заметить опасную позицию", "распознать морфему или условие", "объяснить написание", "применить в контексте"]},
@@ -246,7 +246,7 @@ function errorFeedback(t){
  return 'Попробуй исправить себя самостоятельно. Правильный ответ пока не показываем.';
 }
 function useHint(t,c){
- state.hintsUsed++; state.currentHint=(state.currentHint%3)+1; save();
+ state.hintsUsed++; state.currentHint=Math.min(3,state.currentHint+1); save();
  const hints={1:'Вопрос к себе: какую часть слова я сейчас проверяю?',2:t.topic==='prepri'?'Определи значение приставки: присоединение / приближение / близость / неполнота или «очень» / ПЕРЕ-.':t.topic==='yi'?'Сначала выдели приставку и посмотри, на согласную ли она заканчивается.':t.topic==='kos'?'Посмотри, есть ли сразу после корня суффикс -А-.':'Найди границу двух основ.',3:t.explanation};
  $('#hintArea',c).innerHTML=`<div class="hint-box"><strong>Подсказка ${state.currentHint}/3.</strong> ${hints[state.currentHint]}</div>`;
 }
@@ -295,14 +295,14 @@ function renderResult(){
  const results=isDiag?state.diagnosticResults:state.trainingResults;
  const independence=results.length?Math.round(results.filter(x=>x.hints===0).length/results.length*100):0;
  const self=results.length?Math.round(results.filter(x=>x.attempts>1 && x.ok).length/results.length*100):0;
- page(`<p class="eyebrow">${isDiag?'Диагностика завершена':'Результат занятия'}</p><h1>${isDiag?'Твой маршрут готов.':'Сегодня навык стал устойчивее.'}</h1>
+ page(`<p class="eyebrow">${isDiag?'Диагностика завершена':'Результат занятия'}</p><h1>${isDiag?'Твой маршрут готов.':'Сегодня ты потренировался.'}</h1>
  <div class="grid" style="margin-top:26px">${metricCard('Точность с первой попытки',`${results.length?Math.round(results.filter(x=>x.attempts===1).length/results.length*100):0}%`,'не смешиваем с ответами после подсказки','yellow')}${metricCard('Самостоятельность',`${independence}%`,'ответы без подсказок')}${metricCard('Самоисправления',`${self}%`,'ошибка → повторная попытка → верный ответ','blue')}</div>
  <section class="section"><div class="grid"><article class="card wide"><h3>Твоя сильная сторона</h3><div class="metric" style="font-size:2rem">${labelTopic(s.strong)}</div><p>Здесь можно постепенно убирать опоры и переходить к смешанным заданиям.</p></article><article class="card"><h3>Зона роста</h3><div class="metric" style="font-size:2rem">${labelTopic(s.weak)}</div><p>Система вернёт тебя к тому шагу, где появляется затруднение.</p></article><article class="card full pink"><h3>Сегодня потренируем</h3><p style="font-size:1.15rem;max-width:760px">Сначала — обнаружение и распознавание орфограммы, затем — объяснение алгоритма и перенос в предложение.</p><button class="btn" data-route="trainer">Продолжить тренировку</button></article></div></section>
  <div class="actions"><button class="btn secondary" data-route="passport">Открыть паспорт зоркости</button><button class="btn secondary" data-route="student">В кабинет ученика</button></div>`);
 }
 
 function renderTrainer(){
- if(!state.diagnosticDone){navigate('diagnosis');return}
+ if(!state.diagnosticDone&&!state.directTopic){navigate('diagnosis');return}
  const id=state.trainingQueue[state.trainingIndex] || state.trainingQueue[0];
  const t=trainerBank.find(x=>x.id===id) || trainerBank[0];
  const pct=Math.round((state.trainingIndex/Math.max(6,state.trainingQueue.length))*100);
@@ -407,6 +407,7 @@ function startTopicTraining(topic){
  state.trainingQueue=tasks.map(t=>t.id);
  state.trainingIndex=0;
  state.currentHint=0;
+ state.directTopic=true;
  save(); navigate('trainer');
 }
 
@@ -458,7 +459,7 @@ function renderWorksheet(){
  <div class="field"><label for="sheetSpace">Место для ответа</label><select id="sheetSpace"><option value="compact">Компактное</option><option value="spacious" selected>Для объяснения</option></select></div></div>
  <div class="field" style="margin-top:18px"><label>02. Орфограммы для подбора</label><div class="sheet-toolbar"><button class="btn secondary small" id="allSheetTopics">Выбрать все</button><button class="btn secondary small" id="clearSheetTopics">Сбросить</button></div><div class="topic-checks">${orthograms.map(o=>`<label class="topic-check"><input type="checkbox" class="sheetTopic" value="${escPrint(o.id)}" checked><span>${escPrint(o.title)}</span></label>`).join('')}</div></div>
  <div class="actions"><button id="buildSheets" class="btn blue">Сформировать варианты →</button></div><p id="sheetStatus" class="micro" role="status" aria-live="polite">Выбирайте темы с учётом реально пройденного материала: для 5 класса темы 6 класса нужно отключить.</p></div>
- <div class="sheet-panel sheet-right"><p class="eyebrow">Принцип работы</p><h2>03. Редакторский стол</h2><p>Каждый вариант содержит индивидуальную подборку из утверждённого банка. Перед печатью можно изменить формулировки, ответы и количество строк.</p><div class="paper-art"><span>А</span><span>а</span><span>Я</span><p>Слово → орфограмма → объяснение</p></div><div id="sheetPreview"><div class="sheet-empty">Предварительный просмотр появится после формирования.</div></div></div></section>`);
+ <div class="sheet-panel sheet-right"><p class="eyebrow">Принцип работы</p><h2>03. Редакторский стол</h2><p>Каждый вариант содержит индивидуальную подборку из утверждённого банка. Перед печатью можно изменить формулировки и ключи первого варианта. Остальные варианты формируются из того же банка; их тоже нужно проверить.</p><div class="paper-art"><span>А</span><span>а</span><span>Я</span><p>Слово → орфограмма → объяснение</p></div><div id="sheetPreview"><div class="sheet-empty">Предварительный просмотр появится после формирования.</div></div></div></section>`);
  $('#allSheetTopics').onclick=()=>$$('.sheetTopic').forEach(x=>x.checked=true);
  $('#clearSheetTopics').onclick=()=>$$('.sheetTopic').forEach(x=>x.checked=false);
  $('#buildSheets').onclick=buildSheets;
@@ -484,7 +485,7 @@ function drawSheetPreview(){
  $('#sheetPreview').innerHTML=`<div class="sheet-summary"><strong>${sheetVariants.length} вариантов</strong><span>${first.length} заданий в каждом · доступно редактирование</span></div>
  <label class="checkline" style="margin:14px 0"><input id="sheetApproved" type="checkbox"><span>Я проверил(а) орфограммы, формулировки и ключи перед печатью.</span></label>
  <div class="sheet-scroll"><h3>Вариант 1 · предварительный просмотр</h3>${first.map((t,i)=>`<div class="sheet-edit"><div class="sheet-num">${i+1} <small>${escPrint(t.topic)}</small></div><textarea class="sheet-question" data-i="${i}" aria-label="Текст задания ${i+1}">${escPrint(t.question)}</textarea><details><summary>Ключ и объяснение</summary><textarea class="sheet-answer" data-i="${i}" aria-label="Ответ ${i+1}">${escPrint(t.answer)}</textarea></details></div>`).join('')}</div>
- <div class="actions"><button id="printSheets" class="btn blue" disabled>Печать / Сохранить PDF</button><button id="regenerateSheets" class="btn secondary">Другие варианты ↻</button></div><p class="micro">На печать выводятся все варианты и, по выбору, отдельные ключи. Изменения в предпросмотре применяются к варианту № 1.</p>`;
+ <div class="actions"><button id="printSheets" class="btn blue" disabled>Печать / Сохранить PDF</button><button id="regenerateSheets" class="btn secondary">Другие варианты ↻</button></div><p class="micro">На печать выводятся все варианты и, по выбору, отдельные ключи. В предпросмотре можно изменить только вариант № 1. Обязательно проверь остальные варианты при печати.</p>`;
  $$('.sheet-question').forEach(el=>el.addEventListener('input',()=>sheetVariants[0][+el.dataset.i].question=el.value));
  $$('.sheet-answer').forEach(el=>el.addEventListener('input',()=>sheetVariants[0][+el.dataset.i].answer=el.value));
  $('#sheetApproved').onchange=e=>$('#printSheets').disabled=!e.target.checked;
