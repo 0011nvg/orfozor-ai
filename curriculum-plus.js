@@ -25,8 +25,8 @@ for(const o of orthograms){
 }
 for(const [topic,pairs] of Object.entries(supplements))pairs.forEach(([good,wrong,why],i)=>{
  const opts=i%2?[good,wrong]:[wrong,good];
- trainerBank.push({id:'more-'+topic+'-'+i+'-c',topic,type:'choice',stage:3,title:'Осмысленный выбор',prompt:'Выбери нормативное написание и объясни правило.',options:opts,correct:opts.indexOf(good),explanation:why});
- trainerBank.push({id:'more-'+topic+'-'+i+'-e',topic,type:'editor',stage:4,title:'Редактор слов',prompt:'Исправь написание; найди условие выбора.',text:wrong,expected:good,explanation:why});
+ trainerBank.push({id:'more-'+topic+'-'+i+'-c',topic,type:'choice',stage:3,title:'Осмысленный выбор',prompt:'Выбери нормативное написание. После проверки прочитай разбор.',options:opts,correct:opts.indexOf(good),explanation:why});
+ trainerBank.push({id:'more-'+topic+'-'+i+'-e',topic,type:'editor',stage:4,title:'Редактор слов',prompt:'Исправь написание самостоятельно. Затем сравни ответ с объяснением.',text:wrong,expected:good,explanation:why});
 });
 
 /* Teaching review: learner identifies an operation; the rule is shown afterwards.
@@ -55,6 +55,17 @@ for(const t of trainerBank){
  t.prompt=data[0];
  t.options=data[1];
  t.correct=data[2];
+}
+
+/* Remove answer-position guessing across diagnostic, rule and practice choices.
+   Stable by task ID; no random reshuffle while pupil is answering. */
+for(const t of [...diagnosticTasks,...trainerBank]){
+ if(t.type!=='choice'||!Array.isArray(t.options)||t.options.length<2||!Number.isInteger(t.correct))continue;
+ const count=t.options.length;
+ const shift=[...String(t.id)].reduce((n,ch)=>n+ch.charCodeAt(0),0)%count;
+ if(!shift)continue;
+ t.options=[...t.options.slice(count-shift),...t.options.slice(0,count-shift)];
+ t.correct=(t.correct+shift)%count;
 }
 const authorsHTML='<section class="authors-lab"><p class="eyebrow">СОСТАВИТЕЛИ И АВТОРЫ ПРОЕКТА</p><h2>Люди, которые создают лабораторию</h2><div class="authors-grid"><article class="author-paper"><span class="author-number">01 / ЦИФРОВАЯ МАСТЕРСКАЯ</span><h3>Науменко Виктория Геннадьевна</h3><p>Педагог МАОУ СОШ № 73 города Краснодара. Соавтор проекта и разработчик цифровой образовательной среды.</p></article><article class="author-paper"><span class="author-number">02 / МЕТОДИЧЕСКАЯ МАСТЕРСКАЯ</span><h3>Каян Татьяна Анатольевна</h3><p>Учитель русского языка и литературы МАОУ СОШ № 73 города Краснодара; старший преподаватель кафедры филологического образования Института развития образования Краснодарского края.</p><p class="author-source">Подтверждение: <a href="https://iro23.ru/?p=48745" target="_blank" rel="noopener noreferrer">ИРО Краснодарского края</a>.</p></article></div></section>';
 const addAuthors=()=>{
