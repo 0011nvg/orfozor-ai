@@ -403,3 +403,197 @@
  #main .page .mission-steps article{break-inside:avoid;}
  #main .page .mission-actions{display:none!important;}
 }
+
+/* ОрфоЗор / О проекте: литературный манифест, октябрь 2026 */
+#main .page:not(:has(.reference-hero)) .about-editorial{position:relative;max-width:1120px;margin:0 auto}
+#main .page:not(:has(.reference-hero)) .about-editorial h1,
+#main .page:not(:has(.reference-hero)) .about-editorial h2,
+#main .page:not(:has(.reference-hero)) .about-editorial h3{margin:0;color:#392C2D}
+#main .page:not(:has(.reference-hero)) .about-cover{
+ position:relative;isolation:isolate;overflow:hidden;
+ padding:clamp(26px,5vw,61px) clamp(22px,5vw,57px) clamp(35px,5vw,60px);
+ border:1px solid #D6BDAA;
+ background:linear-gradient(109deg,#F7EADC 0%,#F8EFE4 59%,#EEDACB 100%);
+ box-shadow:7px 10px 0 rgba(108,64,47,.09);
+}
+#main .page:not(:has(.reference-hero)) .about-cover:before{
+ content:"";position:absolute;top:0;left:0;right:0;height:14px;
+ background:linear-gradient(97deg,#A63541,#7C242E 72%,#D37474);
+ clip-path:polygon(0 0,100% 0,100% 80%,91% 65%,83% 93%,73% 64%,62% 88%,51% 68%,40% 95%,28% 68%,18% 88%,9% 62%,0 92%);
+}
+#main .page:not(:has(.reference-hero)) .about-cover:after{
+ content:"";position:absolute;inset:auto -23px -45px auto;width:min(35%,300px);height:74%;z-index:-1;
+ opacity:.2;background:var(--art-books) center/cover no-repeat;
+ filter:sepia(.25);mask-image:linear-gradient(90deg,transparent,#000 45%);
+}
+#main .page:not(:has(.reference-hero)) .about-volume{
+ display:block;color:#996E61;font:800 .64rem/1.6 "Golos Text",sans-serif;
+ letter-spacing:.17em;margin:19px 0 18px;
+}
+#main .page:not(:has(.reference-hero)) .about-cover h1{
+ font:500 clamp(2.5rem,6vw,5.55rem)/1.11 Prata,Georgia,serif;
+ letter-spacing:-.065em;max-width:830px;text-wrap:balance;color:#30282B;
+}
+#main .page:not(:has(.reference-hero)) .about-cover h1 em{
+ color:#922F39;font-style:normal;
+ border-bottom:3px solid #BC797D;
+}
+#main .page:not(:has(.reference-hero)) .about-lead{
+ font:400 clamp(1.06rem,1.82vw,1.39rem)/1.67 Literata,Georgia,serif;
+ color:#534440;max-width:785px;margin:28px 0 25px;
+}
+#main .page:not(:has(.reference-hero)) .about-handnote{
+ max-width:340px;padding:15px 18px;margin:0 7% 0 auto;position:relative;
+ border:1px solid #E0C4AD;background:#FFF8EC;box-shadow:5px 7px 0 rgba(109,71,46,.1);
+ transform:rotate(-3deg);font:500 1rem/1.55 Caveat,Georgia,serif;color:#87383C;
+}
+#main .page:not(:has(.reference-hero)) .about-handnote:before{
+ content:"";position:absolute;top:-10px;left:38%;width:80px;height:22px;
+ background:#D1B39488;transform:rotate(6deg);
+}
+#main .page:not(:has(.reference-hero)) .about-chapter{
+ display:grid;grid-template-columns:180px minmax(0,1fr);gap:24px;align-items:baseline;
+ border-top:2px solid #CBB1A0;padding-top:15px;margin-bottom:26px;
+}
+#main .page:not(:has(.reference-hero)) .about-chapter>span,
+#main .page:not(:has(.reference-hero)) .about-smallcap{
+ font:800 .69rem/1.5 "Golos Text",sans-serif;letter-spacing:.13em;color:#9B4651;
+}
+#main .page:not(:has(.reference-hero)) .about-chapter h2{
+ font:500 clamp(1.5rem,3.5vw,2.7rem)/1.2 Literata,Georgia,serif;letter-spacing:-.047em;
+}
+#main .page:not(:has(.reference-hero)) .about-intro,
+#main .page:not(:has(.reference-hero)) .about-sequence,
+#main .page:not(:has(.reference-hero)) .about-audience,
+#main .page:not(:has(.reference-hero)) .about-values{margin:clamp(47px,6vw,80px) 0 0}
+#main .page:not(:has(.reference-hero)) .about-prose{
+ display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,65px);
+}
+#main .page:not(:has(.reference-hero)) .about-prose p,
+#main .page:not(:has(.reference-hero)) .about-value-prose p{
+ font:400 1rem/1.85 Literata,Georgia,serif;color:#534740;margin:0;
+}
+#main .page:not(:has(.reference-hero)) .about-prose p:first-child:first-letter{
+ float:left;font:500 3.2rem/.86 Prata,Georgia,serif;padding:8px 8px 0 0;color:#943943;
+}
+#main .page:not(:has(.reference-hero)) .about-goal{
+ margin-top:clamp(43px,5vw,73px);padding:clamp(25px,4.3vw,50px);
+ background:#8A2D38;color:#FFF8EF;position:relative;isolation:isolate;
+ border:1px solid #71232D;box-shadow:6px 9px 0 rgba(103,46,42,.14);overflow:hidden;
+}
+#main .page:not(:has(.reference-hero)) .about-goal:after{
+ content:"";position:absolute;z-index:-1;right:-25px;bottom:-90px;width:280px;height:340px;
+ background:var(--art-books) center/cover no-repeat;opacity:.11;filter:grayscale(1);
+}
+#main .page:not(:has(.reference-hero)) .about-goal .about-smallcap{color:#F6C6BC}
+#main .page:not(:has(.reference-hero)) .about-goal h2{
+ color:#FFF7E7;font:500 clamp(1.95rem,4vw,3.55rem)/1.18 Prata,Georgia,serif;
+ letter-spacing:-.056em;max-width:850px;margin:18px 0 24px;text-wrap:balance;
+}
+#main .page:not(:has(.reference-hero)) .about-goal>p{
+ color:#FFF2E3;max-width:830px;font:400 clamp(.98rem,1.6vw,1.13rem)/1.82 Literata,Georgia,serif;
+}
+#main .page:not(:has(.reference-hero)) .about-goal .about-goal-note{
+ font:500 clamp(1.05rem,1.75vw,1.3rem)/1.6 Literata,Georgia,serif;
+ margin:30px 0 0;padding:16px 19px 0 0;border-top:1px solid #C18A88;
+}
+#main .page:not(:has(.reference-hero)) .about-step-grid{
+ display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;
+}
+#main .page:not(:has(.reference-hero)) .about-step{
+ position:relative;padding:22px 16px 25px;min-width:0;
+ border:1px solid #D5BDA9;background:#FFF9F0;
+ box-shadow:3px 5px 0 rgba(96,56,39,.06);
+}
+#main .page:not(:has(.reference-hero)) .about-step:nth-child(2),
+#main .page:not(:has(.reference-hero)) .about-step:nth-child(5){background:#E4EAEB}
+#main .page:not(:has(.reference-hero)) .about-step:nth-child(3){background:#F4DDDC}
+#main .page:not(:has(.reference-hero)) .about-step>span{
+ display:block;color:#A24B52;font:500 clamp(1.6rem,3vw,2.6rem)/1 Prata,Georgia,serif;margin-bottom:22px;
+}
+#main .page:not(:has(.reference-hero)) .about-step h3{
+ font:600 1.12rem/1.35 Literata,Georgia,serif;color:#5E3440;margin-bottom:13px;
+}
+#main .page:not(:has(.reference-hero)) .about-step p{
+ font:.83rem/1.67 "Golos Text",sans-serif;color:#65544C;margin:0;
+}
+#main .page:not(:has(.reference-hero)) .about-audience-grid{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;
+}
+#main .page:not(:has(.reference-hero)) .about-audience-card{
+ position:relative;padding:24px 22px 29px;background:#F8ECD9;
+ border:1px solid #D6BCA8;box-shadow:4px 5px 0 rgba(93,60,39,.09);
+}
+#main .page:not(:has(.reference-hero)) .about-audience-card:before{
+ content:"";position:absolute;top:-9px;left:33%;width:65px;height:19px;
+ background:#D3B69A88;transform:rotate(-5deg);
+}
+#main .page:not(:has(.reference-hero)) .about-audience-card:nth-child(2){background:#EAD7D8}
+#main .page:not(:has(.reference-hero)) .about-audience-card:nth-child(3){background:#E4EBE8}
+#main .page:not(:has(.reference-hero)) .about-stamp{
+ display:inline-block;font:800 .62rem/1.5 "Golos Text",sans-serif;letter-spacing:.17em;
+ color:#8B4147;border-bottom:1px solid #BC8D85;padding-bottom:8px;margin-bottom:15px;
+}
+#main .page:not(:has(.reference-hero)) .about-audience-card h3{
+ font:600 clamp(1.12rem,1.95vw,1.5rem)/1.36 Literata,Georgia,serif;
+ margin:0 0 14px;color:#57343B;
+}
+#main .page:not(:has(.reference-hero)) .about-audience-card p{
+ color:#584D49;font:.87rem/1.8 "Golos Text",sans-serif;
+}
+#main .page:not(:has(.reference-hero)) .about-value-layout{
+ display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.7fr);gap:clamp(20px,4vw,55px);
+}
+#main .page:not(:has(.reference-hero)) .about-value-prose{display:grid;gap:19px}
+#main .page:not(:has(.reference-hero)) .about-value-note{
+ position:relative;align-self:start;padding:27px 25px;background:#F2DED4;
+ border:1px solid #D1AC9B;box-shadow:5px 7px 0 rgba(97,55,38,.08);transform:rotate(1.3deg);
+}
+#main .page:not(:has(.reference-hero)) .about-value-note>span{
+ font:800 .6rem/1.5 "Golos Text",sans-serif;letter-spacing:.15em;color:#A04D4C;
+}
+#main .page:not(:has(.reference-hero)) .about-value-note blockquote{
+ border:0;margin:17px 0;font:500 1.2rem/1.57 Literata,Georgia,serif;
+ color:#56323B;padding:0;
+}
+#main .page:not(:has(.reference-hero)) .about-value-note p{
+ font:.81rem/1.7 "Golos Text",sans-serif;color:#786057;margin:0;
+}
+#main .page:not(:has(.reference-hero)) .about-actions{display:flex;flex-wrap:wrap;gap:12px;margin:52px 0 23px}
+#main .page:not(:has(.reference-hero)) .about-stage-note{
+ border-top:1px solid #D8C4B4;padding:16px 0;margin:0;
+ font:.77rem/1.7 "Golos Text",sans-serif;color:#786960;max-width:820px;
+}
+#main .page:not(:has(.reference-hero)) .about-editorial~.authors-lab{margin-top:63px}
+@media(max-width:980px){
+ #main .page:not(:has(.reference-hero)) .about-step-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ #main .page:not(:has(.reference-hero)) .about-chapter{grid-template-columns:140px 1fr}
+}
+@media(max-width:680px){
+ #main .page:not(:has(.reference-hero)) .about-cover{padding:32px 19px 35px}
+ #main .page:not(:has(.reference-hero)) .about-cover h1{font-size:clamp(2rem,9vw,3rem)}
+ #main .page:not(:has(.reference-hero)) .about-handnote{margin:18px 1% 0 auto;font-size:.97rem}
+ #main .page:not(:has(.reference-hero)) .about-chapter{grid-template-columns:1fr;gap:11px}
+ #main .page:not(:has(.reference-hero)) .about-prose,
+ #main .page:not(:has(.reference-hero)) .about-value-layout{grid-template-columns:1fr}
+ #main .page:not(:has(.reference-hero)) .about-step-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ #main .page:not(:has(.reference-hero)) .about-audience-grid{grid-template-columns:1fr}
+ #main .page:not(:has(.reference-hero)) .about-step{padding:16px 13px}
+ #main .page:not(:has(.reference-hero)) .about-step h3{font-size:1.05rem}
+ #main .page:not(:has(.reference-hero)) .about-step>span{margin-bottom:14px}
+ #main .page:not(:has(.reference-hero)) .about-goal{padding:29px 21px}
+ #main .page:not(:has(.reference-hero)) .about-actions .btn{width:100%;justify-content:center}
+}
+@media(max-width:390px){
+ #main .page:not(:has(.reference-hero)) .about-step-grid{grid-template-columns:1fr}
+ #main .page:not(:has(.reference-hero)) .about-cover h1{font-size:2.1rem}
+}
+@media print{
+ #main .page:not(:has(.reference-hero)) .about-cover,
+ #main .page:not(:has(.reference-hero)) .about-goal{box-shadow:none!important;background:#fff!important;color:#111!important}
+ #main .page:not(:has(.reference-hero)) .about-goal h2,
+ #main .page:not(:has(.reference-hero)) .about-goal p{color:#111!important}
+ #main .page:not(:has(.reference-hero)) .about-step,
+ #main .page:not(:has(.reference-hero)) .about-audience-card{box-shadow:none!important;break-inside:avoid}
+ #main .page:not(:has(.reference-hero)) .about-actions{display:none!important}
+}
