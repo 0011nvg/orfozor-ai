@@ -37,6 +37,27 @@ const detectiveRounds=[
 ['Маша написала «сверхынтересный»: она решила, что после любой приставки на согласную нужна Ы. Что упущено?',['Исключение для приставки сверх-','Суффикс -а- после корня','Соединительная гласная'],0,'После сверх- и меж- сохраняется И: сверхинтересный, межинститутский.'],
 ['На афише написали «небольшой, а маленький». Почему редактор исправил написание?',['Прилагательное всегда пишется с НЕ раздельно','Есть противопоставление с союзом А','Слово «маленький» неизменяемое'],1,'При противопоставлении «не большой, а маленький» НЕ с прилагательным пишется раздельно.']
 ].map(([question,options,correct,why])=>({question,options,correct,why}));
+
+/* Editorial audit: coherent Russian texts and clues that do not give away the answer. */
+editorRounds[1].story='Ребята решили разиграть сценку. Режиссёр попросил не прикосаться к декорациям без разрешения. На подготовку отвели пятдесят минут.';
+editorRounds[3].story='На рисунке петушек стоял на заборе. У калитки виднелся крючек, а на сосновой ветке белел снежек.';
+editorRounds[4].story='В отзыве написали: «Это была неправда, а вымысел. Спектакль был неинтересный, а скучный. Сама история — далеко непростая».';
+editorRounds[4].errors[1]=['неинтересный','не интересный','При противопоставлении «не интересный, а скучный» НЕ с прилагательным пишется раздельно.'];
+editorRounds[4].errors[2]=['непростая','не простая','При наличии «далеко не» частица НЕ с прилагательным пишется раздельно.'];
+editorRounds[5].story='Ребята прешкольного лагеря решили преклеить заметки в альбом, но редактор попросил не приувеличить события.';
+const builderClues=[
+ 'Дотронуться до поверхности; после корня есть суффикс -а-.',
+ 'Один раз дотронуться до поверхности; суффикса -а- после корня нет.',
+ 'Исполнить сцену по ролям; перед корнем русская приставка на согласную.',
+ 'Очень интересный; приставка сверх- сохраняет начальную гласную корня.',
+ 'Присоединить вырезку к альбому, используя клей.',
+ 'Чрезмерно увеличить значение события.',
+ 'Маленький замок; при изменении: замочка.',
+ 'Маленький ключ; при изменении: ключика.',
+ 'Сделанный из дерева; это одно из трёх слов-исключений.',
+ 'Ласковое обращение к другу; суффикс после Ж под ударением.'
+];
+buildRounds.forEach((r,i)=>{r.clue=builderClues[i];});
 const catalog={
 hunt:{title:'Орфоохота',tag:'ЗАМЕЧАЮ',desc:'7 уровней по 6 слов. Восстанови каждую пропущенную букву, ориентируясь на правило.',rounds:huntRounds},
 editor:{title:'Редактор вырезок',tag:'ПРИМЕНЯЮ',desc:'6 газетных заметок: найди несколько ошибок, исправь и объясни их.',rounds:editorRounds},
@@ -45,7 +66,7 @@ detective:{title:'Орфо-детектив',tag:'ОБЪЯСНЯЮ',desc:'7 ис
 };
 let run={mode:'',index:0,errors:0,firstTry:0,solved:false,attempts:0};
 const E=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const norm=s=>String(s||'').trim().toLowerCase().replace(/ё/g,'е').replace(/\s+/g,' ');
+const norm=s=>String(s||'').trim().toLowerCase().replace(/\s+/g,' ');
 const explain=(msg,type)=>{const f=document.querySelector('#advancedFeedback');f.className='game-note '+type;f.innerHTML=msg};
 function renderAdvancedGames(){
  const mode=(location.hash.split('mode=')[1]||'').split('&')[0];
@@ -90,7 +111,7 @@ function renderAdvancedGames(){
     '<div class="editor-fields">'+round.errors.map((e,i)=>'<label><span>Правка № '+String(i+1).padStart(2,'0')+'</span><input class="editor-correction text-input" data-index="'+i+'" placeholder="Исправленное слово" aria-label="Исправление '+(i+1)+'" autocomplete="off" spellcheck="false"><small class="editor-msg" id="editorResult'+i+'"></small></label>').join('')+'</div></section>';
  }
  if(mode==='build'){
-  stage='<p class="game-instruction">Собери слово по смыслу: '+E(round.word)+'. Выбери правильный фрагмент и объясни правило.</p><div class="constructor-view" id="constructorView"><span>'+E(round.prefix)+'</span><span class="constructor-slot" id="constructorSlot">?</span><span>'+E(round.suffix)+'</span></div><div class="constructor-tiles">'+round.options.map((x,i)=>'<button class="constructor-tile" aria-pressed="false" data-piece="'+E(x)+'">'+E(x)+'</button>').join('')+'</div><p class="constructor-status" id="constructorStatus">Поставь деталь на место.</p>';
+  stage='<p class="game-instruction"><strong>Слово-загадка.</strong> '+E(round.clue)+' Выбери подходящую часть, а затем объясни правило.</p><div class="constructor-view" id="constructorView"><span>'+E(round.prefix)+'</span><span class="constructor-slot" id="constructorSlot">?</span><span>'+E(round.suffix)+'</span></div><div class="constructor-tiles">'+round.options.map((x,i)=>'<button class="constructor-tile" aria-pressed="false" data-piece="'+E(x)+'">'+E(x)+'</button>').join('')+'</div><p class="constructor-status" id="constructorStatus">Поставь деталь на место.</p>';
  }
  if(mode==='detective'){
   stage='<div class="detective-case"><span class="case-stamp">ДЕЛО № '+(run.index+1)+'</span><p>'+E(round.question)+'</p></div><div class="game-choice-list">'+round.options.map((x,i)=>'<button class="detective-answer" aria-pressed="false" data-choice="'+i+'">'+E(x)+'</button>').join('')+'</div>';
