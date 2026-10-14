@@ -339,3 +339,67 @@
  #main .page:not(:has(.reference-hero)) .creator-atelier{padding:15px 12px}
  #main .page:not(:has(.reference-hero)) .creator-draft{padding:14px 11px}
 }
+
+/* Mission editorial section: an authentic literary-essay spread, not a corporate brief. */
+#main .page .mission-page{display:block;position:relative;margin:0 auto 20px;max-width:1100px;}
+#main .page .mission-opening{
+ position:relative;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(240px,.7fr);
+ gap:clamp(18px,4vw,44px);padding:clamp(18px,3.5vw,38px);
+ background:linear-gradient(112deg,#F9F2E8 2%,#F4E8D7 85%);
+ border:1px solid #D9C2AD;box-shadow:7px 9px 0 rgba(88,58,41,.07);
+ overflow:hidden;
+}
+#main .page .mission-opening:before{content:"";position:absolute;left:11%;top:-7px;width:104px;height:17px;transform:rotate(-4deg);background:rgba(198,164,126,.35);}
+#main .page .mission-opening:after{content:"";position:absolute;top:0;bottom:0;right:0;width:32%;pointer-events:none;opacity:.12;background:var(--art-books) center/cover no-repeat;mask-image:linear-gradient(to right,transparent,black);}
+#main .page .mission-copy{position:relative;z-index:2;}
+#main .page .mission-copy h1{font:500 clamp(2.05rem,4.2vw,4.2rem)/1.18 Prata,Georgia,serif;color:#672632;letter-spacing:-.055em;text-wrap:balance;margin:21px 0 24px;}
+#main .page .mission-copy h1 em{color:#A44750;font-style:italic;}
+#main .page .mission-copy p{font-size:clamp(.95rem,1.3vw,1.04rem);line-height:1.78;color:#514840;max-width:750px;}
+#main .page .mission-copy .mission-lead{font:500 clamp(1.12rem,1.9vw,1.38rem)/1.57 Literata,Georgia,serif;color:#372E2C;}
+#main .page .mission-quote{z-index:1;align-self:center;transform:rotate(2deg);border:1px solid #D2B5A3;padding:clamp(18px,2.5vw,30px) clamp(16px,2vw,26px);background:linear-gradient(155deg,#F3D5D7,#F9E8E4);box-shadow:5px 6px 0 rgba(102,54,49,.08);position:relative;}
+#main .page .mission-quote:before{content:"";position:absolute;top:-10px;left:20%;width:78px;height:19px;background:rgba(213,176,146,.58);transform:rotate(-7deg);}
+#main .page .mission-quote>span{display:block;font:800 .61rem/1.5 "Golos Text",sans-serif;letter-spacing:.12em;color:#984753;}
+#main .page .mission-quote blockquote{padding:0;margin:22px 0;font:500 clamp(1.25rem,2.25vw,1.85rem)/1.43 Literata,Georgia,serif;color:#622D35;}
+#main .page .mission-quote small{font-size:.77rem;letter-spacing:.05em;color:#74535A;}
+#main .page .mission-purpose,#main .page .mission-path,#main .page .mission-audience,#main .page .mission-vision{margin:25px 0 0;padding:clamp(20px,3.5vw,35px);position:relative;border:1px solid #DEC9B7;background:#FFFAF2;box-shadow:3px 5px 0 rgba(88,56,36,.06);}
+#main .page .mission-purpose{border-left:7px solid #A74E57;}
+#main .page .mission-audience{background:linear-gradient(175deg,#F7EFE6,#FBF8F0);}
+#main .page .mission-vision{background:linear-gradient(110deg,#E5EAF0,#F8F1E6);border-left:7px solid #62788C;}
+#main .page .mission-purpose h2,#main .page .mission-path h2,#main .page .mission-audience h2,#main .page .mission-vision h2{
+ font:550 clamp(1.55rem,2.9vw,2.45rem)/1.25 Literata,Georgia,serif;letter-spacing:-.035em;color:#612F36;margin:9px 0 20px;text-wrap:balance;
+}
+#main .page .mission-purpose p:not(.eyebrow),#main .page .mission-vision p:not(.eyebrow){font:400 clamp(.95rem,1.4vw,1.06rem)/1.85 "Golos Text",sans-serif;color:#4E4540;max-width:930px;}
+#main .page .mission-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+#main .page .mission-steps article{position:relative;padding:24px 17px 20px;background:#F4E9DC;border:1px solid #DEC5AD;box-shadow:2px 4px 0 rgba(92,54,38,.055);min-width:0;}
+#main .page .mission-steps article:nth-child(2){background:#F2DEE0;}
+#main .page .mission-steps article:nth-child(3){background:#EDF0E4;}
+#main .page .mission-steps article:nth-child(4){background:#E4ECF2;}
+#main .page .mission-step-num{display:block;color:#A45858;letter-spacing:.12em;font:800 .73rem/1 "Golos Text",sans-serif;border-bottom:1px solid #D3BDA9;padding-bottom:14px;}
+#main .page .mission-steps h3{font:600 clamp(1.1rem,1.55vw,1.45rem)/1.3 Literata,Georgia,serif;color:#55343A;margin:16px 0 9px;}
+#main .page .mission-steps p{font-size:.9rem;line-height:1.65;color:#5B4E48;margin:0;}
+#main .page .mission-audience-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px;}
+#main .page .mission-audience-card{background:#FFFAF2;border:1px solid #D9C1AA;padding:25px 24px;position:relative;box-shadow:3px 5px 0 rgba(90,55,39,.06);}
+#main .page .mission-audience-card:nth-child(2){background:#F4E4DF;}
+#main .page .mission-stamp{display:inline-block;color:#8C4148;border-bottom:1px solid #BB8A86;padding-bottom:9px;font:800 .64rem/1.4 "Golos Text",sans-serif;letter-spacing:.15em;}
+#main .page .mission-audience-card h3{font:600 1.33rem/1.42 Literata,Georgia,serif;margin:18px 0 9px;color:#4A3436;}
+#main .page .mission-audience-card p{font-size:.94rem;line-height:1.77;margin:0;color:#514741;}
+#main .page .mission-actions{margin:31px 0 45px;display:flex;gap:12px;flex-wrap:wrap;}
+@media(max-width:870px){
+ #main .page .mission-opening{grid-template-columns:1fr;}
+ #main .page .mission-quote{max-width:480px;transform:rotate(.5deg);}
+ #main .page .mission-steps{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media(max-width:560px){
+ #main .page .mission-opening{padding:20px 16px;}
+ #main .page .mission-opening:after{display:none;}
+ #main .page .mission-copy h1{font-size:clamp(1.95rem,8vw,2.75rem);}
+ #main .page .mission-steps,#main .page .mission-audience-grid{grid-template-columns:1fr;}
+ #main .page .mission-purpose,#main .page .mission-path,#main .page .mission-audience,#main .page .mission-vision{padding:20px 15px;}
+ #main .page .mission-audience-card{padding:20px 15px;}
+ #main .page .mission-actions .btn{width:100%;justify-content:center;}
+}
+@media print{
+ #main .page .mission-opening,#main .page .mission-purpose,#main .page .mission-path,#main .page .mission-audience,#main .page .mission-vision,#main .page .mission-quote,#main .page .mission-audience-card{background:#fff!important;box-shadow:none!important;}
+ #main .page .mission-steps article{break-inside:avoid;}
+ #main .page .mission-actions{display:none!important;}
+}
