@@ -313,7 +313,7 @@ h1,h2,h3,.metric{font-family:Literata,Georgia,serif}
 .game-card-build{background:#f5edd8}
 .game-card-detective{background:#e7e1ea}
 .clip-note{margin-top:18px;background:#fff8ee;border:1px solid #d7c8b8;box-shadow:3px 4px 0 rgba(71,55,41,.05);padding:16px 18px 16px 20px;position:relative}
-.clip-note::before{content:"МЕТОДИЧЕСКАЯ ПОМЕТА";display:block;margin-bottom:8px;font:.6rem/1 "Golos Text",sans-serif;font-weight:800;letter-spacing:.18em;color:#8D6E63}
+.clip-note::before{content:"ЗАМЕТКА ИЗ МАСТЕРСКОЙ";display:block;margin-bottom:8px;font:.6rem/1 "Golos Text",sans-serif;font-weight:800;letter-spacing:.18em;color:#8D6E63}
 @media(max-width:960px){
   .patch-cut span{font-size:clamp(1.3rem,3vw,2.15rem)}
   .patch-band{width:66%;right:7%}
