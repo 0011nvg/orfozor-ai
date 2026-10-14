@@ -92,3 +92,5 @@
 @media(max-width:650px){.newgame-paper{padding:18px 16px;clip-path:none}.newgame-paper:after{left:7px}.newgame-heading{flex-direction:column;gap:10px}.newgame-count{align-self:flex-end;margin-top:-10px}.hunt-grid{grid-template-columns:1fr}.hunt-item{min-height:100px}.orth-note-grid{grid-template-columns:1fr}.authors-lab{padding:20px 14px}.author-paper{padding:20px}.editor-newspaper{padding:19px 13px}.editor-newspaper p{font-size:1rem}.constructor-tiles{gap:9px}.constructor-tile{min-width:66px;padding:13px}.game-controls{justify-content:stretch}.game-controls button{flex:1}}
 @media(prefers-reduced-motion:reduce){.tile-snap,.constructor-view.game-solved{animation:none!important}.constructor-tile,.hunt-item,.newgame-progress>div{transition:none!important}}
 @media print{.newgame .btn,.authors-lab:before,.game-controls{display:none!important}.newgame-paper{box-shadow:none!important;clip-path:none!important}}
+
+.author-byline{margin:14px 0 23px;padding:13px 18px;border-left:4px solid #a14c52;background:#f3e7dc;color:#64443d;font-size:.9rem;line-height:1.7}.author-byline strong{font-weight:800;color:#522c36}
