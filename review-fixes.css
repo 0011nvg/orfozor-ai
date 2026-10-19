@@ -1,0 +1,214 @@
+/*
+ * ОрфоЗор — визуальная редактура, 19.10.2026.
+ * Load after literary-workshop.css. Only layout / visual presentation.
+ * Whole-object navigation atlas replaces the cropped sources in media.css.
+ * Atlas order: student, teacher, library, print / hunt, editor, build, detective.
+ */
+
+/* Keep the complete 830 × 674 cover visible at every width. The interactive
+ * note belongs in document flow, so it cannot obscure the bottom of the art or
+ * collide with later sections when feedback expands. */
+.reference-collage {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: auto;
+  width: 100%;
+  max-width: 690px;
+  min-width: 0;
+  margin-inline: auto;
+}
+.reference-collage .hero-art {
+  position: relative;
+  inset: auto;
+  flex: none;
+  width: 100%;
+  aspect-ratio: 415 / 337;
+  background-size: contain;
+  background-position: center;
+  clip-path: none;
+  border-radius: 2px;
+}
+.reference-collage .hero-demo {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  min-height: 0;
+  margin: 0;
+  transform: none;
+}
+
+/* Equal image frames and a shared baseline within each card family. No
+ * negative image margins, stretched backgrounds, or staggered card positions. */
+.reference-entry .entry-grid,
+.home-games .home-games-grid {
+  align-items: stretch;
+}
+.reference-entry .entry-card,
+.home-games .home-game {
+  min-width: 0;
+  min-height: 0;
+  padding: 18px;
+  transform: none;
+  overflow: visible;
+}
+.reference-entry .entry-card:nth-child(2),
+.reference-entry .entry-card:nth-child(4) {
+  transform: none;
+}
+.reference-entry .entry-card .entry-art,
+.home-games .home-game .home-game-art {
+  display: block;
+  flex: none;
+  align-self: center;
+  width: 100%;
+  max-width: 240px;
+  height: auto;
+  aspect-ratio: 1;
+  margin: 14px auto 18px;
+  background-image: url('assets/navigation-atlas.webp');
+  background-position: center;
+  background-size: 400% 200%;
+  background-repeat: no-repeat;
+}
+.reference-entry .entry-learner .entry-art { background-position: 0 0; }
+.reference-entry .entry-teacher .entry-art { background-position: 33.333333% 0; }
+.reference-entry .entry-library .entry-art { background-position: 66.666667% 0; }
+.reference-entry .entry-print .entry-art { background-position: 100% 0; }
+.home-games .game-hunt .home-game-art { background-position: 0 100%; }
+.home-games .game-editor .home-game-art { background-position: 33.333333% 100%; }
+.home-games .game-build .home-game-art { background-position: 66.666667% 100%; }
+.home-games .game-detective .home-game-art { background-position: 100% 100%; }
+.reference-entry .entry-card strong,
+.home-games .home-game strong {
+  min-height: 2.65em;
+  font-size: clamp(1.1rem, 1.45vw, 1.48rem);
+  line-height: 1.33;
+  overflow-wrap: break-word;
+}
+.reference-entry .entry-card > span:not(.entry-art):not(.entry-num),
+.home-games .home-game > span:not(.home-game-art):not(.home-game-index) {
+  max-width: none;
+  font-size: .84rem;
+  line-height: 1.6;
+}
+.reference-entry .entry-card:hover,
+.reference-entry .entry-card:nth-child(2):hover,
+.reference-entry .entry-card:nth-child(4):hover,
+.home-games .home-game:hover {
+  transform: translateY(-3px);
+}
+
+/* Panoramas are panoramas, rather than arbitrary slices of a larger picture. */
+.collage-bottom {
+  height: auto;
+  aspect-ratio: 1086 / 102;
+  background-size: contain;
+}
+#main .page:not(:has(.reference-hero)) .news-engraving-art {
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 1086 / 102;
+  background-size: 100% 100%, contain !important;
+}
+
+/* Decorative title images must also fit their frame. */
+#main .page:not(:has(.reference-hero)) .newgame-heading::after {
+  width: min(32%, 210px);
+  height: auto;
+  aspect-ratio: 1;
+  background-image: url('assets/navigation-atlas.webp');
+  background-size: 400% 200%;
+  background-position: 66.666667% 0;
+}
+#main .page:not(:has(.reference-hero)) .game-mode-hunt .newgame-heading::after {
+  background-image: url('assets/navigation-atlas.webp');
+  background-position: 0 100%;
+}
+#main .page:not(:has(.reference-hero)) .game-mode-editor .newgame-heading::after {
+  background-image: url('assets/navigation-atlas.webp');
+  background-position: 33.333333% 100%;
+}
+#main .page:not(:has(.reference-hero)) .game-mode-build .newgame-heading::after {
+  background-image: url('assets/navigation-atlas.webp');
+  background-position: 66.666667% 100%;
+}
+#main .page:not(:has(.reference-hero)) .game-mode-detective .newgame-heading::after {
+  background-image: url('assets/navigation-atlas.webp');
+  background-position: 100% 100%;
+}
+
+/* The same old fragments were repeated behind text in these sections. Keep
+ * their paper surfaces and remove those redundant, already-cropped bitmaps. */
+#main .page:not(:has(.reference-hero)) .paper-art {
+  background: #F5E5D0;
+}
+#main .page:not(:has(.reference-hero)) .detective-case {
+  background: #F8EDD9;
+}
+#main .page:not(:has(.reference-hero)) .authors-lab {
+  background: #F7ECDB;
+}
+#main .page .mission-opening::after,
+#main .page:not(:has(.reference-hero)) .about-cover::after,
+#main .page:not(:has(.reference-hero)) .about-goal::after {
+  display: none;
+}
+
+/* Allow long Russian titles / controls to shrink inside flex and grid tracks. */
+.reference-hero > *,
+.section-head > *,
+.task-top > *,
+.newgame-heading > *,
+.orth-head > * {
+  min-width: 0;
+}
+.reference-hero h1,
+.task-title,
+.newgame-heading h1,
+.orth-head strong {
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 960px) {
+  .reference-collage {
+    max-width: 620px;
+  }
+}
+@media (max-width: 620px) {
+  .reference-entry .entry-card,
+  .home-games .home-game {
+    padding: 16px;
+  }
+  .reference-entry .entry-card strong,
+  .home-games .home-game strong {
+    font-size: 1.15rem;
+  }
+  .reference-collage .hero-demo {
+    padding: 16px;
+  }
+}
+@media (max-width: 520px) {
+  .reference-entry .entry-grid,
+  .home-games .home-games-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+  .reference-entry .entry-card .entry-art,
+  .home-games .home-game .home-game-art {
+    aspect-ratio: 1;
+    max-height: none;
+  }
+  .reference-entry .entry-card strong,
+  .home-games .home-game strong {
+    min-height: 0;
+    font-size: 1.35rem;
+  }
+  .reference-entry .entry-card > span:not(.entry-art):not(.entry-num),
+  .home-games .home-game > span:not(.home-game-art):not(.home-game-index) {
+    font-size: .9rem;
+  }
+  .home-games .home-game small {
+    font-size: .63rem;
+  }
+}
