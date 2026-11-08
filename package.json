@@ -1,0 +1,16 @@
+{
+  "name": "orfozor",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Орфозор — тренажёр русского языка для 5–6 классов",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "serve": "python3 -m http.server 8000"
+  },
+  "devDependencies": {
+    "dictionary-ru": "^3.0.0",
+    "nspell": "^2.1.5"
+  },
+  "license": "UNLICENSED"
+}
