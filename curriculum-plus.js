@@ -116,7 +116,7 @@ for(const o of orthograms){
 }
 for(const [topic,pairs] of Object.entries(supplements))pairs.forEach(([good,wrong,why],i)=>{
  const opts=i%2?[good,wrong]:[wrong,good];
- trainerBank.push({id:'more-'+topic+'-'+i+'-c',topic,type:'choice',stage:3,title:'Выбери написание',prompt:'Один из вариантов содержит орфографическую ошибку. Выбери правильное написание и объясни свой выбор.',options:opts,correct:opts.indexOf(good),explanation:why});
+ trainerBank.push({id:'more-'+topic+'-'+i+'-c',topic,type:'choice',stage:4,title:'Выбери написание',prompt:'Один из вариантов содержит орфографическую ошибку. Выбери правильное написание. После ответа сравни своё рассуждение с объяснением.',options:opts,correct:opts.indexOf(good),explanation:why});
  trainerBank.push({id:'more-'+topic+'-'+i+'-e',topic,type:'editor',stage:4,title:'Редактор слов',prompt:topic==='imper'?'Исправь ошибку в записи просьбы или совета. Введи исправленный вариант целиком.':'Здесь намеренно допущена орфографическая ошибка. Введи исправленный вариант целиком.',text:wrong,expected:good,explanation:why});
 });
 

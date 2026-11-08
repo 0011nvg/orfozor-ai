@@ -875,13 +875,46 @@ const basePassport = {
   speed:'22 с/задание', streak:6,
 };
 
-let state = JSON.parse(localStorage.getItem('orfozor-state') || 'null') || {
+function freshState(){return {
   diagnosticIndex:0, diagnosticResults:[], diagnosticDone:false,
   trainingIndex:0, trainingQueue:['t1','t2','t3','t4','t5','t6'], trainingResults:[],
   hintsUsed:0, currentHint:0, lastStudentId:'s4',
-};
-function save(){localStorage.setItem('orfozor-state',JSON.stringify(state));}
-function resetDemo(){for(const key of Object.keys(localStorage)){if(key.startsWith('orfozor-'))localStorage.removeItem(key);} location.hash='#home'; location.reload();}
+};}
+let storageUnavailable=false;
+function loadState(){
+ const clean=freshState();
+ try{
+  const stored=JSON.parse(localStorage.getItem('orfozor-state')||'null');
+  if(!stored||typeof stored!=='object'||Array.isArray(stored))return clean;
+  const count=v=>Number.isSafeInteger(v)&&v>=0&&v<=10000000;
+  const results=v=>Array.isArray(v)?v.filter(r=>r&&typeof r==='object'&&typeof r.taskId==='string'&&orthograms.some(o=>o.id===r.topic)&&[1,2,3,4].includes(r.stage)&&typeof r.ok==='boolean'&&count(r.attempts)&&r.attempts>0&&count(r.hints)&&r.hints<=3&&Number.isFinite(r.time)&&r.time>=0&&Number.isFinite(r.ts)).slice(-10000):[];
+  const diagnostic=results(stored.diagnosticResults);
+  for(let i=0;i<diagnostic.length&&diagnostic[i].taskId===diagnosticTasks[i]?.id;i++)clean.diagnosticResults.push(diagnostic[i]);
+  clean.diagnosticIndex=clean.diagnosticResults.length;
+  clean.diagnosticDone=clean.diagnosticIndex===diagnosticTasks.length;
+  clean.trainingResults=results(stored.trainingResults);
+  if(count(stored.trainingSessionStart))clean.trainingSessionStart=Math.min(stored.trainingSessionStart,clean.trainingResults.length);
+  if(Array.isArray(stored.trainingQueue)&&stored.trainingQueue.length&&stored.trainingQueue.every(id=>typeof id==='string'&&/^[a-zA-Z0-9-]+$/.test(id)))clean.trainingQueue=stored.trainingQueue.slice(0,1000);
+  if(count(stored.trainingIndex))clean.trainingIndex=Math.min(stored.trainingIndex,clean.trainingQueue.length);
+  if(count(stored.hintsUsed))clean.hintsUsed=stored.hintsUsed;
+  if(count(stored.currentHint)&&stored.currentHint<=3)clean.currentHint=stored.currentHint;
+  if(demoStudents.some(s=>s.id===stored.lastStudentId))clean.lastStudentId=stored.lastStudentId;
+  clean.directTopic=stored.directTopic===true;
+  const active=stored.activeTask;
+  if(active&&typeof active==='object'&&typeof active.taskId==='string'&&/^[a-zA-Z0-9-]+$/.test(active.taskId)&&['diagnostic','training'].includes(active.mode)&&count(active.attempts)&&Number.isFinite(active.startedAt)&&active.startedAt>0&&typeof active.completed==='boolean'&&(!active.completed||(Number.isFinite(active.elapsed)&&active.elapsed>=0)))clean.activeTask={taskId:active.taskId,mode:active.mode,attempts:active.attempts,startedAt:active.startedAt,completed:active.completed,elapsed:active.elapsed};
+  return clean;
+ }catch{return clean;}
+}
+let state=loadState();
+function save(){
+ try{localStorage.setItem('orfozor-state',JSON.stringify(state));storageUnavailable=false;return true;}
+ catch{if(!storageUnavailable)showToast('Прогресс доступен в этой вкладке, но браузер не разрешил его сохранить. Не закрывайте вкладку до завершения работы.');storageUnavailable=true;return false;}
+}
+function resetDemo(){
+ state=freshState();
+ try{for(const key of Object.keys(localStorage)){if(key.startsWith('orfozor-'))localStorage.removeItem(key);}}catch{storageUnavailable=true;}
+ location.hash='#home';location.reload();
+}
 function showToast(msg){toast.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2200)}
 
 const routeMap = {
@@ -890,7 +923,13 @@ const routeMap = {
   studentprofile:renderStudentProfile, creator:renderCreator, worksheet:renderWorksheet, library:renderLibrary, games:renderGames,
   research:renderResearch, method:renderMethod, about:renderAbout
 };
-function navigate(route){location.hash='#'+route;}
+function navigate(route){
+ if(route==='trainer'&&state.trainingQueue.length&&state.trainingIndex>=Math.min(state.trainingQueue.length,8)){
+  const summary=diagnosticSummary(state.trainingResults.slice(state.trainingSessionStart||0));
+  startTopicTraining(summary.weak||diagnosticSummary().weak||orthograms[0].id);return;
+ }
+ location.hash='#'+route;
+}
 function route(){const r=(location.hash||'#home').slice(1).split('?')[0];(routeMap[r]||renderHome)();window.scrollTo(0,0);closeMenu();}
 window.addEventListener('hashchange',route);
 document.addEventListener('click',e=>{if(e.target.closest('[data-reset-progress]')){resetDemo();return;}const game=e.target.closest('[data-game]');if(game){navigate('games?mode='+game.dataset.game);return;}const btn=e.target.closest('[data-route]');if(btn) navigate(btn.dataset.route)});
@@ -964,7 +1003,7 @@ function renderDiagnosis(){
  const t=diagnosticTasks[state.diagnosticIndex];
  const pct=Math.round((state.diagnosticIndex/diagnosticTasks.length)*100);
  page(`<section class="task-shell">
-  <p class="eyebrow">Стартовая диагностика</p>
+  <p class="eyebrow">Стартовая диагностика · 7 заданий</p><p class="micro">Короткая проба охватывает 4 из 15 тем: КОС-/КАС-, И/Ы после приставок, ПРЕ-/ПРИ-, соединительные О/Е. Это не полная диагностика курса русского языка.</p>
   <div class="callout"><strong>Давай узнаем, какие задания тебе уже даются легко, а что стоит потренировать.</strong> Это не контрольная работа. Здесь важно понять, как ты рассуждаешь.</div>
   <div class="task-top"><div><div class="task-type">${t.title}</div><h1>${t.prompt}</h1></div><div style="min-width:180px">${progress(`${state.diagnosticIndex+1} из ${diagnosticTasks.length}`,pct)}</div></div>
   <div class="task-card" id="diagnosticTask"></div>
@@ -983,11 +1022,17 @@ function taskBody(t, mode){
 
 function renderTask(t, containerId, mode){
  const c=$('#'+containerId); c.innerHTML=taskBody(t,mode);
- let selected=null, attempts=0, start=Date.now(), completed=false, completedElapsed=0;
+ const previous=state.activeTask;
+ const resume=previous&&previous.taskId===t.id&&previous.mode===mode;
+ if(!resume){state.currentHint=0;state.activeTask={taskId:t.id,mode,attempts:0,startedAt:Date.now(),completed:false,elapsed:0};save();}
+ const active=state.activeTask;
+ let selected=null, attempts=active.attempts, start=active.startedAt, completed=active.completed, completedElapsed=active.elapsed;
  if(t.type==='spot') renderClickableWord('taskWord',t.word,t.correct,(_,i)=>selected=i);
  if(t.type==='choice') $$('.choice',c).forEach(b=>b.addEventListener('click',()=>{$$('.choice',c).forEach(x=>x.classList.remove('selected'));b.classList.add('selected');selected=+b.dataset.choice}));
  $('#hintBtn',c).addEventListener('click',()=>{ if(!completed) useHint(t,c); });
+ if(state.currentHint)useHint(t,c,true);
  const checkBtn=$('#checkBtn',c);
+ if(completed){$('#taskFeedback',c).className='feedback show ok';$('#taskFeedback',c).innerHTML=`<strong>Верно.</strong> ${t.explanation}`;checkBtn.textContent=mode==='diagnostic'?'Дальше':'Следующее';$('#hintBtn',c).disabled=true;c.querySelectorAll('.choice,.letter,#editorInput,#explainInput').forEach(input=>input.disabled=true);}
  checkBtn.addEventListener('click',()=>{
    if(completed){finishTask(t,mode,true,attempts,completedElapsed);return;}
    attempts++;
@@ -997,9 +1042,11 @@ function renderTask(t, containerId, mode){
    if(t.type==='editor'){const v=$('#editorInput',c).value.trim().replace(/\s+/g,' ').toLowerCase();if(!v){attempts--;showToast('Введи свой вариант.');return}ok=v===t.expected.toLowerCase();}
    if(t.type==='explain'){const v=$('#explainInput',c).value.trim().toLowerCase();if(!v){attempts--;showToast('Напиши короткое объяснение.');return}ok=t.keywords.every(k=>v.includes(k));}
    const elapsed=Math.max(1,Math.round((Date.now()-start)/1000));
+   active.attempts=attempts;active.elapsed=elapsed;active.completed=ok;save();
    const f=$('#taskFeedback',c);f.className='feedback show '+(ok?'ok':'retry');
    if(ok){
      completed=true; completedElapsed=elapsed;
+     c.querySelectorAll('.choice,.letter,#editorInput,#explainInput').forEach(input=>input.disabled=true);
      f.innerHTML=`<span class="icon">✅</span><strong>Верно.</strong> ${t.explanation}`;
      checkBtn.textContent=mode==='diagnostic'?'Дальше':'Следующее';
      $('#hintBtn',c).disabled=true;
@@ -1015,11 +1062,13 @@ function errorFeedback(t){
  if(t.stage===3) return 'Проверь условие выбора буквы и примени подходящее правило. Если нужно, открой подсказку.';
  return 'Попробуй исправить себя самостоятельно. Правильный ответ пока не показываем.';
 }
-function useHint(t,c){
- if(state.currentHint>=3){showToast('Все три подсказки уже показаны. Попробуй объяснить правило своими словами.');return;}
- state.hintsUsed++;
- state.currentHint++;
- save();
+function useHint(t,c,restore=false){
+ if(!restore){
+  if(state.currentHint>=3){showToast('Все три подсказки уже показаны. Попробуй объяснить правило своими словами.');return;}
+  state.hintsUsed++;
+  state.currentHint++;
+  save();
+ }
  const topicHints={
   kos:'Найди корень КОС-/КАС- и проверь, стоит ли сразу после него суффикс -А-.',
   gor:'Определи, падает ли ударение на гласную корня ГОР-/ГАР-.',
@@ -1051,6 +1100,7 @@ function recordSoftError(t,mode,attempts,elapsed){
 function finishTask(t,mode,ok,attempts,elapsed){
  const result={taskId:t.id,topic:t.topic,stage:t.stage,ok,attempts,hints:state.currentHint,time:elapsed,ts:Date.now()};
  state.currentHint=0;
+ state.activeTask=null;
  if(mode==='diagnostic'){
    state.diagnosticResults.push(result);state.diagnosticIndex++;
    if(state.diagnosticIndex>=diagnosticTasks.length){state.diagnosticDone=true;save();navigate('result')} else {save();renderDiagnosis()}
@@ -1076,47 +1126,65 @@ function adaptQueue(task,result){
  }
 }
 
-function diagnosticSummary(){
- const r=state.diagnosticResults;
+function diagnosticSummary(r=state.diagnosticResults){
  const topicStats={}; orthograms.forEach(o=>topicStats[o.id]={n:0,score:0});
  r.forEach(x=>{if(topicStats[x.topic]){topicStats[x.topic].n++;topicStats[x.topic].score+=(x.attempts===1?1:.55)-(x.hints*.1)}});
  const ranked=Object.entries(topicStats).filter(([,v])=>v.n).map(([k,v])=>({topic:k,score:v.score/v.n})).sort((a,b)=>a.score-b.score);
- return {weak:ranked[0]?.topic||'prepri', strong:ranked.at(-1)?.topic||'gor', accuracy:r.length?Math.round(r.filter(x=>x.attempts===1).length/r.length*100):0};
+ return {weak:ranked[0]?.topic||null, strong:ranked.at(-1)?.topic||null, accuracy:r.length?Math.round(r.filter(x=>x.ok&&x.attempts===1&&x.hints===0).length/r.length*100):0};
 }
 function labelTopic(id){return orthograms.find(o=>o.id===id)?.title||id}
 function renderResult(){
  const isDiag=state.diagnosticDone && state.trainingResults.length===0;
- const s=diagnosticSummary();
- const results=isDiag?state.diagnosticResults:state.trainingResults;
+ const results=isDiag?state.diagnosticResults:state.trainingResults.slice(state.trainingSessionStart||0);
+ const s=diagnosticSummary(results);
  const independence=results.length?Math.round(results.filter(x=>x.hints===0).length/results.length*100):0;
  const self=results.length?Math.round(results.filter(x=>x.attempts>1 && x.ok).length/results.length*100):0;
- page(`<p class="eyebrow">${isDiag?'Диагностика завершена':'Результат занятия'}</p><h1>${isDiag?'Твой маршрут готов.':'Сегодня ты потренировался.'}</h1>
- <div class="grid" style="margin-top:26px">${metricCard('Точность с первой попытки',`${results.length?Math.round(results.filter(x=>x.attempts===1).length/results.length*100):0}%`,'не смешиваем с ответами после подсказки','yellow')}${metricCard('Самостоятельность',`${independence}%`,'ответы без подсказок')}${metricCard('Самоисправления',`${self}%`,'ошибка → повторная попытка → верный ответ','blue')}</div>
- <section class="section"><div class="grid"><article class="card wide"><h3>Твоя сильная сторона</h3><div class="metric" style="font-size:2rem">${labelTopic(s.strong)}</div><p>Здесь можно постепенно убирать опоры и переходить к смешанным заданиям.</p></article><article class="card"><h3>Зона роста</h3><div class="metric" style="font-size:2rem">${labelTopic(s.weak)}</div><p>Система вернёт тебя к тому шагу, где появляется затруднение.</p></article><article class="card full pink"><h3>Сегодня потренируем</h3><p style="font-size:1.15rem;max-width:760px">Сначала — обнаружение и распознавание орфограммы, затем — объяснение алгоритма и перенос в предложение.</p><button class="btn" data-route="trainer">Продолжить тренировку</button></article></div></section>
+ page(`<p class="eyebrow">${isDiag?'Диагностика завершена':'Результат занятия'}</p><h1>${!results.length?'Здесь появится результат занятия.':isDiag?'Твой маршрут готов.':'Сегодня ты потренировался.'}</h1>
+ <div class="grid" style="margin-top:26px">${metricCard('Точность с первой попытки',`${results.length?Math.round(results.filter(x=>x.ok&&x.attempts===1&&x.hints===0).length/results.length*100):0}%`,'не смешиваем с ответами после подсказки','yellow')}${metricCard('Самостоятельность',`${independence}%`,'ответы без подсказок')}${metricCard('Самоисправления',`${self}%`,'ошибка → повторная попытка → верный ответ','blue')}</div>
+ <section class="section"><div class="grid"><article class="card wide"><h3>Твоя сильная сторона</h3><div class="metric" style="font-size:2rem">${s.strong?labelTopic(s.strong):'Пока нет данных'}</div><p>Это относительно лучший результат среди выполненных заданий занятия. Для вывода об освоении нужны новые примеры и отсроченная проверка.</p></article><article class="card"><h3>Зона роста</h3><div class="metric" style="font-size:2rem">${s.weak?labelTopic(s.weak):'Пока нет данных'}</div><p>Это тема для следующей проверки. При одинаковых результатах нужны дополнительные задания, чтобы уточнить рекомендацию.</p></article><article class="card full pink"><h3>Сегодня потренируем</h3><p style="font-size:1.15rem;max-width:760px">Сначала — обнаружение и распознавание орфограммы, затем — объяснение алгоритма и перенос в предложение.</p><button class="btn" data-route="trainer">Продолжить тренировку</button></article></div></section>
  <div class="actions"><button class="btn secondary" data-route="passport">Открыть паспорт зоркости</button><button class="btn secondary" data-route="student">В кабинет ученика</button></div>`);
 }
 
 function renderTrainer(){
  if(!state.diagnosticDone&&!state.directTopic){navigate('diagnosis');return}
+ if(state.trainingQueue.length&&state.trainingIndex>=Math.min(state.trainingQueue.length,8)){navigate('result');return;}
  const id=state.trainingQueue[state.trainingIndex] || state.trainingQueue[0];
  const t=trainerBank.find(x=>x.id===id) || trainerBank[0];
  const pct=Math.round((state.trainingIndex/Math.max(6,state.trainingQueue.length))*100);
  page(`<section class="task-shell"><p class="eyebrow">Персональная тренировка · ~10 минут</p><div class="task-top"><div><div class="task-type">${t.title} · ${labelTopic(t.topic)}</div><h1>${t.prompt}</h1></div><div style="min-width:190px">${progress('Тренировка',pct)}</div></div>
- <div class="stage-map"><div class="stage ${t.stage>1?'done':t.stage===1?'current':''}"><b>1 · ЗАМЕЧАЮ</b><small>нахожу опасное место</small></div><div class="stage ${t.stage>2?'done':t.stage===2?'current':''}"><b>2 · РАСПОЗНАЮ</b><small>определяю тип</small></div><div class="stage ${t.stage>3?'done':t.stage===3?'current':''}"><b>3 · ОБЪЯСНЯЮ</b><small>выбираю алгоритм</small></div><div class="stage ${t.stage===4?'current':''}"><b>4 · ПРИМЕНЯЮ</b><small>переношу в контекст</small></div></div>
+ <div class="stage-map"><div class="stage ${t.stage>1?'done':t.stage===1?'current':''}"><b>1 · ЗАМЕЧАЮ</b><small>нахожу опасное место</small></div><div class="stage ${t.stage>2?'done':t.stage===2?'current':''}"><b>2 · РАСПОЗНАЮ</b><small>определяю тип</small></div><div class="stage ${t.stage>3?'done':t.stage===3?'current':''}"><b>3 · ОБЪЯСНЯЮ</b><small>выбираю алгоритм</small></div><div class="stage ${t.stage===4?'current':''}"><b>4 · ПРИМЕНЯЮ</b><small>применяю правило</small></div></div>
  <div class="task-card" id="trainerTask" style="margin-top:18px"></div>
  <div class="callout"><strong>Почему выбрано это задание?</strong>${adaptiveReason(t)}</div></section>`,'compact');
  renderTask(t,'trainerTask','training');
 }
-function adaptiveReason(t){if(t.stage===1)return 'В предыдущих действиях важнее укрепить обнаружение орфограммы — система уменьшает сложность не количеством вопросов, а возвращением к нужной операции.';if(t.stage===2)return 'Опасное место уже замечается, но нужно стабилизировать классификацию орфограммы.';if(t.stage===3)return 'Распознавание достаточно устойчиво; сейчас тренируется выбор правила и алгоритма.';return 'Базовые шаги выполнены: пора проверить перенос навыка в самостоятельное редактирование.'}
+function adaptiveReason(t){if(t.stage===1)return 'Это задание тренирует обнаружение орфограммы: сначала нужно заметить место выбора.';if(t.stage===2)return 'Это задание тренирует распознавание условия и типа орфограммы.';if(t.stage===3)return 'Это задание тренирует выбор правила или алгоритма. Свободное объяснение отдельно обсуди с учителем.';return 'Это задание тренирует применение правила. Правка отдельного слова ещё не доказывает перенос навыка в новый текст.'}
 
 function calcPassport(){
- const p={...basePassport};
  const all=[...state.diagnosticResults,...state.trainingResults];
- if(all.length){p.detection=Math.min(96,60+all.filter(x=>x.stage===1&&x.attempts===1).length*7);p.recognition=Math.min(94,58+all.filter(x=>x.stage===2&&x.attempts===1).length*8);p.ruleUse=Math.min(95,62+all.filter(x=>x.stage===3&&x.attempts===1).length*7);p.selfCorrection=Math.min(92,52+all.filter(x=>x.attempts>1&&x.ok).length*8);p.transfer=Math.min(90,54+all.filter(x=>x.stage===4&&x.attempts===1).length*9)}
+ const percent=(items,test)=>items.length?Math.round(items.filter(test).length/items.length*100):null;
+ const independent=x=>x.ok&&x.attempts===1&&x.hints===0;
+ const p={detection:null,recognition:null,ruleUse:null,transfer:null,
+  selfCorrection:percent(all.filter(x=>x.attempts>1),x=>x.ok&&x.hints===0),
+  mastered:[],training:[],recurrent:[],speed:all.length?`${Math.round(all.reduce((sum,x)=>sum+x.time,0)/all.length)} с/задание`:'Пока нет данных',streak:0};
+ for(const [key,stage] of [['detection',1],['recognition',2],['ruleUse',3],['transfer',4]])p[key]=percent(all.filter(x=>x.stage===stage),independent);
+ for(const topic of orthograms){
+  const results=all.filter(x=>x.topic===topic.id);
+  if(!results.length)continue;
+  const needsPractice=results.some(x=>!independent(x));
+  if(needsPractice){p.training.push(topic.title);p.recurrent.push(`${topic.title}: потребовались повторные попытки или подсказки.`);}
+ }
+ if(!p.training.length)p.training=['Затруднения пока не выявлены'];
+ if(!p.mastered.length)p.mastered=['Недостаточно данных для вывода об освоении'];
+ while(p.recurrent.length<2)p.recurrent.push(p.recurrent.length?'Повторите задания позже, чтобы проверить устойчивость результата.':'Повторяющиеся затруднения пока не установлены.');
+ // Count actual consecutive local calendar days, anchored at the most recent lesson.
+ const days=[...new Set(all.map(x=>{const d=new Date(x.ts);return Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/86400000;}))].sort((a,b)=>b-a);
+ for(let i=0;i<days.length;i++){if(i&&days[i-1]-days[i]!==1)break;p.streak++;}
+ const observed=[p.detection,p.recognition,p.ruleUse,p.transfer].filter(x=>x!==null);
+ p.index=observed.length?`${Math.round(observed.reduce((a,b)=>a+b,0)/observed.length)}%`:'Нет данных';
  return p;
 }
-function renderPassport(){const p=calcPassport();page(`<p class="eyebrow">Паспорт орфографической зоркости</p><h1>Не «7 из 10». А профиль действий.</h1><div class="grid" style="margin-top:28px"><article class="card wide"><h3>Пять наблюдаемых компонентов</h3>${skill('Обнаружение орфограмм',p.detection)}${skill('Распознавание типа',p.recognition)}${skill('Применение правила',p.ruleUse)}${skill('Самоисправление',p.selfCorrection)}${skill('Перенос в текст',p.transfer)}</article><article class="card yellow"><h3>Серия занятий</h3><div class="metric">${p.streak}</div><p>регулярных тренировок</p><p><strong>${p.speed}</strong><br><span class="micro">средняя скорость</span></p></article><article class="card"><h3>Сейчас тренируем</h3><div class="kicker-row">${p.training.map(x=>`<span class="pill blue">${x}</span>`).join('')}</div><h3 style="margin-top:20px">Освоено</h3><div class="kicker-row">${p.mastered.map(x=>`<span class="pill yellow">✓ ${x}</span>`).join('')}</div></article><article class="card wide"><h3>Повторяющиеся паттерны</h3><p>• ${p.recurrent[0]}</p><p>• ${p.recurrent[1]}</p><div class="callout"><strong>Следующее педагогическое действие</strong>Дать короткий блок на смысловые группы ПРИ-, затем вернуть слова с СВЕРХ- в смешанное задание через 2 занятия.</div></article></div><div class="actions"><button class="btn blue" data-route="trainer">Продолжить тренировку</button><button class="btn secondary" data-route="student">К кабинету ученика</button></div>`)}
-function skill(name,val){return `<div class="skill-row"><b>${name}</b><div class="progress"><span style="width:${val}%"></span></div><div class="score">${val}%</div></div>`}
+function renderPassport(){const p=calcPassport();page(`<p class="eyebrow">Паспорт орфографической зоркости</p><h1>Не «7 из 10». А профиль действий.</h1><div class="grid" style="margin-top:28px"><article class="card wide"><h3>Результаты выполненных заданий</h3><p class="micro">Доля верных ответов с первой попытки без подсказок. Самоисправление — доля исправленных без подсказок заданий после ошибки. Выбор написания и правка отдельного слова не доказывают умение объяснять правило или переносить его в новый текст.</p>${skill('Обнаружение орфограмм',p.detection)}${skill('Распознавание типа',p.recognition)}${skill('Выбор правила или алгоритма',p.ruleUse)}${skill('Самоисправление',p.selfCorrection)}${skill('Применение в задании',p.transfer)}</article><article class="card yellow"><h3>Серия занятий</h3><div class="metric">${p.streak}</div><p>регулярных тренировок</p><p><strong>${p.speed}</strong><br><span class="micro">средняя скорость</span></p></article><article class="card"><h3>Сейчас тренируем</h3><div class="kicker-row">${p.training.map(x=>`<span class="pill blue">${x}</span>`).join('')}</div><h3 style="margin-top:20px">Освоено</h3><div class="kicker-row">${p.mastered.map(x=>`<span class="pill yellow">✓ ${x}</span>`).join('')}</div></article><article class="card wide"><h3>Повторяющиеся паттерны</h3><p>• ${p.recurrent[0]}</p><p>• ${p.recurrent[1]}</p><div class="callout"><strong>Следующее педагогическое действие</strong>Повторить темы, где потребовалась помощь, затем проверить результат на новых примерах без подсказок.</div></article></div><div class="actions"><button class="btn blue" data-route="trainer">Продолжить тренировку</button><button class="btn secondary" data-route="student">К кабинету ученика</button></div>`)}
+function skill(name,val){return `<div class="skill-row"><b>${name}</b><div class="progress"><span style="width:${val??0}%"></span></div><div class="score">${val===null?'Нет данных':val+'%'}</div></div>`}
 
 function sparkline(values){
  const w=520,h=122,pad=8,lo=Math.min(...values)-6,hi=Math.max(...values)+6;
@@ -1124,7 +1192,28 @@ function sparkline(values){
  return `<svg class="chart-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="Динамика по демо-данным: рост с ${values[0]} до ${values[values.length-1]} процентов"><polyline points="${points}" fill="none" stroke="#955D6B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${pad}" cy="${h-pad-(values[0]-lo)*(h-2*pad)/(hi-lo)}" r="5" fill="#35435E"/><circle cx="${w-pad}" cy="${h-pad-(values.at(-1)-lo)*(h-2*pad)/(hi-lo)}" r="6" fill="#955D6B"/></svg>`;
 }
 
-function renderStudent(){const p=calcPassport();page(`<p class="eyebrow">Кабинет ученика · демо</p><h1>Привет, Илья.</h1><div class="grid" style="margin-top:28px"><article class="card wide blue"><h3>Тренировка на сегодня</h3><div class="metric" style="font-size:2.2rem">ПРЕ-/ПРИ- + повторение Ы/И</div><p>7 заданий · примерно 11 минут</p>${progress('Сегодня',43)}<button class="btn yellow" data-route="trainer" style="margin-top:20px">Продолжить</button></article><article class="card"><h3>Моя орфографическая зоркость</h3><div class="metric">${Math.round((p.detection+p.recognition+p.ruleUse+p.transfer)/4)}%</div><p>индекс для навигации по прогрессу, не школьная отметка</p><button class="btn secondary small" data-route="passport">Открыть паспорт</button></article><article class="card"><h3>Повторение</h3><p><strong>ГОР-/ГАР-</strong><br><span class="micro">вернём сегодня в смешанном контексте</span></p><div class="pill yellow">через 2 задания</div></article><article class="card"><h3>Новое</h3><p><strong>Соединительные О/Е</strong></p><div class="pill">после повторения</div></article><article class="card wide"><h3>Динамика</h3>${sparkline([48,53,57,61,64,69,73,76])}<p class="micro">Демо-данные: индекс освоения растёт, но система отдельно хранит самостоятельность, подсказки и перенос.</p></article><article class="card yellow"><h3>Личное достижение</h3><div class="metric" style="font-size:1.85rem">Исправляю себя самостоятельно</div><p>3 самоисправления за последние 2 занятия</p></article></div>
+function renderStudent(){
+ const p=calcPassport();
+ const results=[...state.diagnosticResults,...state.trainingResults];
+ const total=Math.min(state.trainingQueue.length,8);
+ const completed=total>0&&state.trainingIndex>=total;
+ const trainingReady=state.diagnosticDone||state.directTopic;
+ const percent=total?Math.round(Math.min(state.trainingIndex,total)/total*100):0;
+ const independent=results.filter(x=>x.ok&&x.attempts===1&&x.hints===0).length;
+ const selfCorrections=results.filter(x=>x.ok&&x.attempts>1&&x.hints===0).length;
+ const recent=results.slice(-5).reverse();
+ const revision=[...new Set(results.filter(x=>x.attempts>1||x.hints>0||!x.ok).map(x=>x.topic))];
+ page(`<p class="eyebrow">Кабинет ученика</p><h1>Твоя лаборатория слова</h1>
+ <p class="section-intro">Здесь показаны результаты заданий, выполненных в этом браузере. Игровые раунды учитываются отдельно в самой игре.</p>
+ <div class="grid" style="margin-top:28px"><article class="card wide blue"><h3>Следующий шаг</h3>
+ ${trainingReady?`<div class="metric" style="font-size:2.2rem">${completed?'Занятие завершено':'Продолжим тренировку'}</div><p>В текущем занятии выполнено ${Math.min(state.trainingIndex,total)} из ${total} заданий.</p>${progress('Текущее занятие',percent)}<button class="btn yellow" data-route="trainer" style="margin-top:20px">${completed?'Начать новое занятие':'Открыть тренировку'}</button>`:`<p>${state.diagnosticIndex?'Ты уже начал короткую диагностику. Продолжи с сохранённого задания.':'Пока нет выполненных заданий. Начни с короткой диагностики или выбери тему в библиотеке.'}</p><button class="btn yellow" data-route="diagnosis">${state.diagnosticIndex?'Продолжить диагностику':'Начать диагностику'}</button><p class="micro">7 заданий по 4 из 15 тем — первая проба, а не полная проверка курса.</p>`}
+ <div class="actions"><button class="btn secondary small" data-route="library">Выбрать тему самостоятельно</button></div></article>
+ <article class="card"><h3>Самостоятельные ответы</h3><div class="metric">${results.length?independent+' из '+results.length:'Нет данных'}</div><p>Верно с первой попытки и без подсказок. Это результат выполненных заданий, а не школьная отметка.</p><button class="btn secondary small" data-route="passport">Открыть паспорт</button></article>
+ <article class="card"><h3>Самоисправления</h3><div class="metric">${selfCorrections}</div><p>Заданий исправлено после ошибки без подсказок.</p><p class="micro">${results.length?'Среднее время: '+p.speed:'Показатели появятся после первого задания.'}</p></article>
+ <article class="card wide"><h3>Последние результаты</h3>${recent.length?'<ol>'+recent.map(x=>'<li><strong>'+labelTopic(x.topic)+'</strong> · '+new Date(x.ts).toLocaleDateString('ru-RU')+'<br><span class="micro">Попыток: '+x.attempts+' · подсказок: '+x.hints+' · '+(x.ok?'задание выполнено':'нужна проверка')+'</span></li>').join('')+'</ol>':'<p>История пока пуста. После выполнения задания здесь появится запись с числом попыток и подсказок.</p>'}</article>
+ <article class="card yellow"><h3>Что повторить</h3>${revision.length?'<ul>'+revision.map(topic=>'<li>'+labelTopic(topic)+'</li>').join('')+'</ul><p class="micro">В этих темах потребовались повторные попытки или помощь. Проверь себя позже на новых примерах.</p>':'<p>Затруднения пока не выявлены. Чтобы выбрать тему повторения, нужны выполненные задания.</p>'}<button class="btn secondary small" data-route="library">Открыть орфограммы</button></article></div>
+`+
+`
 <section class="section kids-section" aria-labelledby="kids-games-heading"><div class="section-head"><div><p class="eyebrow">Игровая практика</p><h2 id="kids-games-heading">Учимся через игру, наблюдение и маленькие открытия</h2></div><p class="section-intro">Форматы ниже помогают удерживать внимание детей 5–6 классов: они тренируют орфографическую зоркость, но выглядят как игра, расследование или творческая задача.</p></div><div class="game-grid"><article class="game-card game-card-hunt"><div class="game-sticker">игра 5–7 минут</div><div class="game-icon" aria-hidden="true">01</div><h3>Орфоохота</h3><p>Найди все «опасные места» в коротком тексте или строке слов. Хорошо работает как разминка в начале занятия.</p><div class="game-meta"><span class="pill">замечаю</span><span class="pill">индивидуально</span></div><button class="btn secondary small" data-game="hunt">Попробовать формат</button></article><article class="game-card game-card-editor"><div class="game-sticker">игра 8–10 минут</div><div class="game-icon" aria-hidden="true">А/О</div><h3>Редактор вырезок</h3><p>Исправь орфографические ошибки в «газетных» заметках, заголовках и подписях. Ребёнок чувствует себя настоящим редактором.</p><div class="game-meta"><span class="pill pink">объясняю</span><span class="pill">в паре</span></div><button class="btn secondary small" data-game="editor">Перейти к заданию</button></article><article class="game-card game-card-build"><div class="game-sticker">игра 6–8 минут</div><div class="game-icon" aria-hidden="true">±</div><h3>Слово-конструктор</h3><p>Собери слово из морфем или карточек, а потом объясни, почему в нём пишется именно эта буква.</p><div class="game-meta"><span class="pill yellow">распознаю</span><span class="pill">мини-группа</span></div><button class="btn secondary small" data-game="build">Собрать слово</button></article><article class="game-card game-card-detective"><div class="game-sticker">игра 7–9 минут</div><div class="game-icon" aria-hidden="true">?</div><h3>Орфо-детектив</h3><p>Определи, почему герой «ошибся»: не заметил орфограмму, перепутал правило или поспешил. Это помогает обсуждать ход мысли.</p><div class="game-meta"><span class="pill blue">анализ</span><span class="pill">обсуждение</span></div><button class="btn secondary small" data-game="detective">Открыть расследование</button></article></div><div class="clip-note"><strong>Зачем мы играем?</strong> В одной игре учимся замечать орфограмму, в другой — выбирать написание, исправлять ошибку и проверять себя. Сначала попробуй решить сам, а потом прочитай объяснение.</div></section>`)}
 
 
@@ -1279,6 +1368,8 @@ function startTopicTraining(topic){
  if(!tasks.length){showToast('Для этой орфограммы задания готовятся.');return;}
  state.trainingQueue=tasks.map(t=>t.id);
  state.trainingIndex=0;
+ state.trainingSessionStart=state.trainingResults.length;
+ state.activeTask=null;
  state.currentHint=0;
  state.directTopic=true;
  save(); navigate('trainer');
@@ -1351,12 +1442,30 @@ function renderAbout(){page(`
   <p class="about-stage-note">Сейчас «ОрфоЗор AI» представлен как интерактивный учебный прототип. Демо-данные учеников вымышлены; задания и рекомендации требуют педагогической проверки. Описанная миссия — направление развития проекта, а не уже доказанный образовательный эффект.</p>
 </section>`)}
 
-route();
+// Initial routing happens in games-plus.js after the complete bank is registered.
 
 
 /* Конструктор печатных работ: локальная генерация только из проверяемого банка заданий.
    Не пересказывает правил и не отправляет данные детей в сеть. */
-let sheetVariants=[];
+let sheetVariants=[], sheetActiveVariant=0, sheetApprovedVariants=new Set(), sheetGeneration=0;
+// Минимальный класс изучения по ФРП русского языка, редакция 2025: с. 9–10, 13–15.
+// В 6 классе доступны также темы 5 класса для повторения.
+const sheetTopicGrades={gor:5,yi:5,chik:5,ekik:5,neNoun:5,neAdj:5,verbs:5,oesh:5,kos:6,prepri:6,oe:6,nne:6,imper:6,hyphen:6,numeral:6};
+function syncSheetGrade(){
+ const grade=Number($('#sheetGrade').value);
+ $$('.sheetTopic').forEach(el=>{el.disabled=(sheetTopicGrades[el.value]||6)>grade;if(el.disabled)el.checked=false;});
+}
+function invalidateSheets(){
+ sheetVariants=[];sheetApprovedVariants.clear();sheetActiveVariant=0;
+ $('#sheetPreview').innerHTML='<div class="sheet-empty">Настройки изменены. Сформируйте варианты заново и проверьте их перед печатью.</div>';
+ $('#sheetStatus').textContent='Подбор нужно сформировать заново: настройки изменены.';
+}
+function revokeSheetApproval(){
+ sheetApprovedVariants.delete(sheetActiveVariant);
+ $('#sheetApproved').checked=false;
+ $('#printSheets').disabled=true;
+ $('#sheetReviewStatus').textContent='Проверено вариантов: '+sheetApprovedVariants.size+' из '+sheetVariants.length+'. После редактирования подтвердите проверку текущего варианта заново.';
+}
 const escPrint = value => String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const bankKinds={spot:'Найди орфограмму',choice:'Выбор и объяснение',editor:'Редактор',input:'Самостоятельное написание'};
 const shuffleSeed=(array, seed)=>[...array].sort((a,b)=>((hashString(a.id+'-'+seed)%997)- (hashString(b.id+'-'+seed)%997)));
@@ -1376,6 +1485,7 @@ function worksheetTask(t,k){
  return {topic,kind:bankKinds.input,question:`${t.prompt||'Запишите правильный ответ.'} ${t.text||t.word||t.stem||''}`,answer:`${t.expected||t.answer||''}. ${t.explanation||''}`};
 }
 function renderWorksheet(){
+ sheetVariants=[];sheetApprovedVariants.clear();sheetActiveVariant=0;
  page(`<p class="eyebrow">Для учителя · печатная мастерская</p><h1>Составьте свою<br><em>орфографическую работу.</em></h1><p class="section-intro">От точечной тренировки до тематической или смешанной проверочной работы. Выберите орфограммы и этапы навыка, проверьте задания и распечатайте варианты с отдельными ключами. Все примеры — из демонстрационной базы и требуют педагогической проверки.</p>
  <section class="sheet-layout"><div class="sheet-panel"><h2>01. Настройка</h2><div class="form-grid">
  <div class="field"><label for="sheetGrade">Класс</label><select id="sheetGrade"><option value="5">5 класс</option><option value="6" selected>6 класс</option></select></div>
@@ -1386,22 +1496,28 @@ function renderWorksheet(){
  <div class="field"><label for="sheetMethod">Тип заданий</label><select id="sheetMethod"><option value="all">Разные механики</option><option value="spot">Поиск орфограмм</option><option value="choice">Выбор с обоснованием</option><option value="editor">Корректор</option></select></div>
  <div class="field"><label for="sheetLayout">Выдача</label><select id="sheetLayout"><option value="both">Работы + ключи</option><option value="only">Только работы</option><option value="keys">Только ключи</option></select></div>
  <div class="field"><label for="sheetSpace">Место для ответа</label><select id="sheetSpace"><option value="compact">Компактное</option><option value="spacious" selected>Для объяснения</option></select></div></div>
- <div class="field" style="margin-top:18px"><label>02. Орфограммы для подбора</label><div class="sheet-toolbar"><button class="btn secondary small" id="allSheetTopics">Выбрать все</button><button class="btn secondary small" id="clearSheetTopics">Сбросить</button></div><div class="topic-checks">${orthograms.map(o=>`<label class="topic-check"><input type="checkbox" class="sheetTopic" value="${escPrint(o.id)}" checked><span>${escPrint(o.title)}</span></label>`).join('')}</div></div>
- <div class="actions"><button id="buildSheets" class="btn blue">Сформировать варианты →</button></div><p id="sheetStatus" class="micro" role="status" aria-live="polite">Выбирайте темы с учётом реально пройденного материала: для 5 класса темы 6 класса нужно отключить.</p></div>
- <div class="sheet-panel sheet-right"><p class="eyebrow">Принцип работы</p><h2>03. Редакторский стол</h2><p>Каждый вариант содержит индивидуальную подборку из утверждённого банка. Перед печатью можно изменить формулировки и ключи первого варианта. Остальные варианты формируются из того же банка; их тоже нужно проверить.</p><div class="paper-art"><span>А</span><span>а</span><span>Я</span><p>Слово → орфограмма → объяснение</p></div><div id="sheetPreview"><div class="sheet-empty">Предварительный просмотр появится после формирования.</div></div></div></section>`);
- $('#allSheetTopics').onclick=()=>$$('.sheetTopic').forEach(x=>x.checked=true);
- $('#clearSheetTopics').onclick=()=>$$('.sheetTopic').forEach(x=>x.checked=false);
+ <div class="field" style="margin-top:18px"><label>02. Орфограммы для подбора</label><div class="sheet-toolbar"><button class="btn secondary small" id="allSheetTopics">Выбрать все</button><button class="btn secondary small" id="clearSheetTopics">Сбросить</button></div><div class="topic-checks">${orthograms.map(o=>`<label class="topic-check"><input type="checkbox" class="sheetTopic" value="${escPrint(o.id)}" checked><span>${escPrint(o.title)} · ${sheetTopicGrades[o.id]||6} класс</span></label>`).join('')}</div></div>
+ <div class="actions"><button id="buildSheets" class="btn blue">Сформировать варианты →</button></div><p id="sheetStatus" class="micro" role="status" aria-live="polite">Темы отбираются по ФРП русского языка (2025): для 5 класса темы 6 класса недоступны; в 6 классе можно повторить материал 5 класса. Учитывайте реально пройденный материал.</p></div>
+ <div class="sheet-panel sheet-right"><p class="eyebrow">Принцип работы</p><h2>03. Редакторский стол</h2><p>Варианты подбираются из учебного банка: задания в разных вариантах могут совпадать. Просмотрите каждый вариант, при необходимости измените формулировки и ключи и отдельно подтвердите его проверку.</p><div class="paper-art"><span>А</span><span>а</span><span>Я</span><p>Слово → орфограмма → объяснение</p></div><div id="sheetPreview"><div class="sheet-empty">Предварительный просмотр появится после формирования.</div></div></div></section>`);
+ $('#allSheetTopics').onclick=()=>{$$('.sheetTopic').forEach(x=>x.checked=!x.disabled);invalidateSheets();};
+ $('#clearSheetTopics').onclick=()=>{$$('.sheetTopic').forEach(x=>x.checked=false);invalidateSheets();};
  $('#buildSheets').onclick=buildSheets;
+ $$('.sheet-panel .form-grid select, #sheetTitle, .sheetTopic').forEach(el=>el.addEventListener('change',invalidateSheets));
+ $('#sheetTitle').addEventListener('input',invalidateSheets);
+ $('#sheetGrade').addEventListener('change',syncSheetGrade);
+ syncSheetGrade();
 }
 function buildSheets(){
- const selected=$$('.sheetTopic:checked').map(x=>x.value), stage=$('#sheetStage').value,kind=$('#sheetMethod').value;
+ const grade=Number($('#sheetGrade').value);
+ const selected=$$('.sheetTopic:checked').map(x=>x.value).filter(topic=>(sheetTopicGrades[topic]||6)<=grade), stage=$('#sheetStage').value,kind=$('#sheetMethod').value;
  if(!selected.length){$('#sheetStatus').textContent='Выберите хотя бы одну орфограмму.';return;}
  let pool=trainerBank.filter(t=>selected.includes(t.topic)&&(!t.type||['spot','choice','editor','input'].includes(t.type))&&(stage==='all'||String(t.stage)===stage)&&(kind==='all'||t.type===kind));
  if(!pool.length){$('#sheetStatus').textContent='Для такого сочетания пока нет готовых заданий. Выберите другой этап или тип.';return;}
  const count=+$('#sheetTaskCount').value,variants=+$('#sheetVariantCount').value;
- // Некоторые варианты должны повторять задания: объём банка ограничен.
+ sheetActiveVariant=0;sheetApprovedVariants.clear();sheetGeneration++;
+ // При ограниченном банке задания могут повторяться, в том числе между вариантами.
  sheetVariants=Array.from({length:variants},(_,v)=>{
-   let ordered=shuffleSeed(pool,v+1),offset=(v*7)%ordered.length;
+   let ordered=shuffleSeed(pool,sheetGeneration*31+v+1),offset=(v*7)%ordered.length;
    ordered=[...ordered.slice(offset),...ordered.slice(0,offset)];
    return Array.from({length:count},(_,i)=>({...worksheetTask(ordered[i%ordered.length],i),id:ordered[i%ordered.length].id+'-'+i}));
  });
@@ -1410,18 +1526,26 @@ function buildSheets(){
 }
 function drawSheetPreview(){
  if(!sheetVariants.length)return;
- const first=sheetVariants[0];
- $('#sheetPreview').innerHTML=`<div class="sheet-summary"><strong>${sheetVariants.length} вариантов</strong><span>${first.length} заданий в каждом · доступно редактирование</span></div>
- <label class="checkline" style="margin:14px 0"><input id="sheetApproved" type="checkbox"><span>Я проверил(а) орфограммы, формулировки и ключи перед печатью.</span></label>
- <div class="sheet-scroll"><h3>Вариант 1 · предварительный просмотр</h3>${first.map((t,i)=>`<div class="sheet-edit"><div class="sheet-num">${i+1} <small>${escPrint(t.topic)}</small></div><textarea class="sheet-question" data-i="${i}" aria-label="Текст задания ${i+1}">${escPrint(t.question)}</textarea><details><summary>Ключ и объяснение</summary><textarea class="sheet-answer" data-i="${i}" aria-label="Ответ ${i+1}">${escPrint(t.answer)}</textarea></details></div>`).join('')}</div>
- <div class="actions"><button id="printSheets" class="btn blue" disabled>Печать / Сохранить PDF</button><button id="regenerateSheets" class="btn secondary">Другие варианты ↻</button></div><p class="micro">На печать выводятся все варианты и, по выбору, отдельные ключи. В предпросмотре можно изменить только вариант № 1. Обязательно проверь остальные варианты при печати.</p>`;
- $$('.sheet-question').forEach(el=>el.addEventListener('input',()=>sheetVariants[0][+el.dataset.i].question=el.value));
- $$('.sheet-answer').forEach(el=>el.addEventListener('input',()=>sheetVariants[0][+el.dataset.i].answer=el.value));
- $('#sheetApproved').onchange=e=>$('#printSheets').disabled=!e.target.checked;
+ const current=sheetVariants[sheetActiveVariant];
+ $('#sheetPreview').innerHTML=`<div class="sheet-summary"><strong>${sheetVariants.length} вариантов</strong><span>${current.length} заданий в каждом · редактируются все варианты</span></div>
+ <div class="field"><label for="sheetVariant">Вариант для проверки</label><select id="sheetVariant">${sheetVariants.map((_,i)=>`<option value="${i}" ${i===sheetActiveVariant?'selected':''}>Вариант ${i+1}${sheetApprovedVariants.has(i)?' · проверен':''}</option>`).join('')}</select></div>
+ <p id="sheetReviewStatus" class="micro" role="status">Проверено вариантов: ${sheetApprovedVariants.size} из ${sheetVariants.length}.</p>
+ <label class="checkline" style="margin:14px 0"><input id="sheetApproved" type="checkbox" ${sheetApprovedVariants.has(sheetActiveVariant)?'checked':''}><span>Я проверил(а) орфограммы, формулировки и ключи варианта ${sheetActiveVariant+1}.</span></label>
+ <div class="sheet-scroll"><h3>Вариант ${sheetActiveVariant+1} · предварительный просмотр</h3>${current.map((t,i)=>`<div class="sheet-edit"><div class="sheet-num">${i+1} <small>${escPrint(t.topic)}</small></div><textarea class="sheet-question" data-i="${i}" aria-label="Текст задания ${i+1}">${escPrint(t.question)}</textarea><details><summary>Ключ и объяснение</summary><textarea class="sheet-answer" data-i="${i}" aria-label="Ответ ${i+1}">${escPrint(t.answer)}</textarea></details></div>`).join('')}</div>
+ <div class="actions"><button id="printSheets" class="btn blue" ${sheetApprovedVariants.size===sheetVariants.length?'':'disabled'}>Печать / Сохранить PDF</button><button id="regenerateSheets" class="btn secondary">Другие варианты ↻</button></div><p class="micro">Для печати проверьте и подтвердите каждый вариант. Изменение задания отменяет подтверждение этого варианта. Изменение настроек требует нового формирования.</p>`;
+ $('#sheetVariant').onchange=e=>{sheetActiveVariant=Number(e.target.value);drawSheetPreview();};
+ $$('.sheet-question').forEach(el=>el.addEventListener('input',()=>{sheetVariants[sheetActiveVariant][+el.dataset.i].question=el.value;revokeSheetApproval();}));
+ $$('.sheet-answer').forEach(el=>el.addEventListener('input',()=>{sheetVariants[sheetActiveVariant][+el.dataset.i].answer=el.value;revokeSheetApproval();}));
+ $('#sheetApproved').onchange=e=>{
+  if(e.target.checked)sheetApprovedVariants.add(sheetActiveVariant);else sheetApprovedVariants.delete(sheetActiveVariant);
+  $('#printSheets').disabled=sheetApprovedVariants.size!==sheetVariants.length;
+  $('#sheetReviewStatus').textContent='Проверено вариантов: '+sheetApprovedVariants.size+' из '+sheetVariants.length+'.';
+ };
  $('#printSheets').onclick=printSheets;
  $('#regenerateSheets').onclick=buildSheets;
 }
 function printSheets(){
+ if(!sheetVariants.length||sheetApprovedVariants.size!==sheetVariants.length){showToast('Сначала проверьте и подтвердите каждый вариант.');return;}
  const grade=$('#sheetGrade').value,title=$('#sheetTitle').value||'Орфографическая работа',layout=$('#sheetLayout').value,spacious=$('#sheetSpace').value==='spacious';
  const section=(tasks,index,keys)=>`<section class="print-sheet"><header class="print-header"><div class="print-mark">ОРФОЗОР <b>AI</b> / РУССКИЙ ЯЗЫК</div><div class="print-eyebrow">${escPrint(grade)} класс · ${keys?'Ключ для учителя':'Самостоятельная работа'} · вариант ${index+1}</div><h1>${escPrint(title)}</h1>${keys?'':`<div class="identity">Фамилия, имя _______________________________ &nbsp; Класс _______ &nbsp; Дата __________</div>`}</header>
  ${tasks.map((t,i)=>`<div class="print-task"><div class="print-meta">${i+1}. <small>${escPrint(t.topic)} · ${escPrint(t.kind)}</small></div><p>${escPrint(keys?t.answer:t.question)}</p>${!keys?`<div class="answer-lines">${spacious?'______________________________________________________<br>______________________________________________________':'______________________________________________________'}</div>`:''}</div>`).join('')}

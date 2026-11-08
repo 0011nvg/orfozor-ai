@@ -192,7 +192,7 @@ function renderAdvancedGames(){
   stage='<div class="detective-case"><span class="case-stamp">ДЕЛО № '+(run.index+1)+'</span><p>'+E(round.question)+'</p></div><div class="game-choice-list">'+round.options.map((x,i)=>'<button class="detective-answer" aria-pressed="false" data-choice="'+i+'">'+E(x)+'</button>').join('')+'</div>';
  }
  page('<section class="newgame game-mode-'+mode+'"><div class="newgame-heading"><div><p class="eyebrow">'+game.tag+' / ИГРОВАЯ ЛАБОРАТОРИЯ</p><h1>'+game.title+'</h1><p>'+game.desc+'</p></div><div class="newgame-count"><strong>'+String(run.index+1).padStart(2,'0')+'</strong><span>из '+String(total).padStart(2,'0')+'</span></div></div><div class="newgame-progress"><div style="width:'+((run.index/total)*100)+'%"></div></div><article class="newgame-paper"><div class="newgame-top"><span>СТРАНИЦА / '+(run.index+1)+'</span><span>ЛАБОРАТОРИЯ РУССКОГО СЛОВА</span></div><h2>'+E(mode==='editor'?'Срочная корректура перед печатью':round.title||round.headline||('Задание '+(run.index+1)))+'</h2>'+stage+'<div id="advancedFeedback" class="game-note" aria-live="polite" role="status"></div><div class="game-controls"><button id="advancedHint" class="btn secondary">Нужна подсказка</button><button id="advancedCheck" class="btn blue">Проверить ответы →</button></div></article><div class="actions"><button class="btn secondary" data-route="games">К выбору игр</button><button class="btn secondary" data-route="student">Кабинет ученика</button></div></section>');
- let selection=null,localAttempts=0;
+ let selection=null;
  document.querySelectorAll('.constructor-tile').forEach(b=>b.onclick=()=>{if(run.solved)return;selection=b.dataset.piece;document.querySelectorAll('.constructor-tile').forEach(x=>{x.classList.remove('selected');x.setAttribute('aria-pressed','false')});b.classList.add('selected');b.setAttribute('aria-pressed','true');const slot=document.querySelector('#constructorSlot');slot.textContent=selection;slot.classList.remove('tile-snap');void slot.offsetWidth;slot.classList.add('tile-snap');});
  document.querySelectorAll('.detective-answer').forEach(b=>b.onclick=()=>{if(run.solved)return;selection=+b.dataset.choice;document.querySelectorAll('.detective-answer').forEach(x=>{x.classList.remove('selected');x.setAttribute('aria-pressed','false')});b.classList.add('selected');b.setAttribute('aria-pressed','true')});
  document.querySelectorAll('.proof-word').forEach(b=>b.onclick=()=>{
@@ -209,9 +209,9 @@ function renderAdvancedGames(){
  };
  document.querySelector('#advancedCheck').onclick=()=>{
   if(run.solved){run.index++;run.solved=false;run.attempts=0;renderAdvancedGames();return;}
-  localAttempts++;
+  run.attempts++;
   const missing=mode==='hunt'?Array.from(document.querySelectorAll('.hunt-letter')).some(x=>!x.value.trim()):mode==='editor'?Array.from(document.querySelectorAll('.editor-correction')).some(x=>!x.value.trim()):selection===null;
-  if(missing){localAttempts--;showToast('Заполни все пропуски или выбери ответ.');return;}
+  if(missing){run.attempts--;showToast('Заполни все пропуски или выбери ответ.');return;}
   let wrong=0;
   if(mode==='hunt'){
    round.items.forEach(([pattern,answer,why],i)=>{const input=document.querySelector('.hunt-letter[data-index="'+i+'"]'),ok=norm(input.value)===norm(answer),msg=document.querySelector('#huntResult'+i);input.classList.toggle('wrong',!ok);input.classList.toggle('right',ok);msg.className='hunt-feedback '+(ok?'right':'wrong');msg.textContent=ok?'✓ '+why:'✎ '+why+' Правильное слово: '+pattern.replace('·',answer)+'.';if(!ok)wrong++;});
@@ -227,7 +227,7 @@ function renderAdvancedGames(){
    else if(mode==='build')explain('<strong>Проверь деталь.</strong> '+E(round.why)+' Найди правильный фрагмент и собери слово ещё раз.', 'retry');
    else explain('<strong>Найдено неточностей: '+wrong+'.</strong> Под каждым неверным ответом есть правило и правильный образец. Исправь свои записи, затем проверь снова.', 'retry');
   }else{
-   run.solved=true;if(localAttempts===1)run.firstTry++;
+   run.solved=true;if(run.attempts===1)run.firstTry++;
    const message=mode==='build'?'Получилось слово «'+round.word+'». '+round.why:mode==='detective'?round.why:mode==='hunt'?'Все шесть пропусков восстановлены. Ты проверил условия написания для каждого слова.':'Газетная заметка исправлена. Объяснения к каждому слову — рядом с ответами.';
    explain('<strong>✓ Отличная редакторская работа.</strong> '+E(message),'success');
    if(mode==='build')document.querySelector('#constructorView').classList.add('game-solved');

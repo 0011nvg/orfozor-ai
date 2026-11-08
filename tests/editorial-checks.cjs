@@ -21,7 +21,7 @@ const location = {hash:'#home',reload(){this.reloaded=true}};
 const context = vm.createContext({console, document:{querySelector:get,querySelectorAll:()=>[],createElement:()=>new Element(),addEventListener(){}},window:{addEventListener(){},scrollTo(){}},location,localStorage:storage,setTimeout,clearTimeout,URLSearchParams,Blob,URL,confirm:()=>true});
 for(const file of ['app.js','curriculum-plus.js','games-plus.js']) {
   let code = fs.readFileSync(path.join(root,file),'utf8');
-  if(file==='games-plus.js') code=code.replace('routeMap.games=renderAdvancedGames;', 'globalThis.gameData={huntRounds,editorRounds,buildRounds,detectiveRounds};routeMap.games=renderAdvancedGames;');
+  if(file==='games-plus.js') code=code.replace('routeMap.games=renderAdvancedGames;', 'globalThis.gameData={huntRounds,editorRounds,buildRounds,detectiveRounds,getRun:()=>run};routeMap.games=renderAdvancedGames;');
   vm.runInContext(code, context, {filename:file});
 }
 const data=vm.runInContext('({orthograms,diagnosticTasks,trainerBank,routeMap,worksheetTask})',context);
@@ -80,6 +80,76 @@ for(const topic of ['oe','yi']){
   vm.runInContext("state.currentHint=0;useHint(currentTask,document.querySelector('#testTask'))",context);
   assert.ok(!get('#hintArea').innerHTML.includes('морфему, в которой'));
 }
+// Answer attempts and hints survive leaving and reopening an exercise.
+const editor=tasks.find(t=>t.type==='editor');context.currentTask=editor;
+vm.runInContext("state.activeTask=null;state.currentHint=0;renderTask(currentTask,'testTask','training')",context);
+get('#editorInput').value='ошибка';get('#checkBtn').events.click();
+get('#hintBtn').events.click();
+const hintsBefore=vm.runInContext('state.hintsUsed',context);
+vm.runInContext("renderTask(currentTask,'testTask','training')",context);
+assert.equal(vm.runInContext('state.activeTask.attempts',context),1);
+assert.ok(get('#hintArea').innerHTML.includes('Подсказка 1/3'));
+assert.equal(vm.runInContext('state.hintsUsed',context),hintsBefore,'restoring a hint must not count it twice');
+get('#editorInput').value=editor.expected;get('#checkBtn').events.click();
+assert.equal(vm.runInContext('state.activeTask.attempts',context),2);
+assert.equal(vm.runInContext('state.activeTask.completed',context),true);
+vm.runInContext("renderTask(currentTask,'testTask','training')",context);
+assert.equal(get('#checkBtn').textContent,'Следующее');
+assert.equal(get('#hintBtn').disabled,true);
+// Passport percentages describe actual independent answers, with missing stages explicit.
+vm.runInContext(`state.diagnosticResults=[];state.trainingResults=[]`,context);
+let passport=vm.runInContext('calcPassport()',context);
+assert.equal(passport.detection,null);assert.equal(passport.index,'Нет данных');assert.equal(passport.streak,0);
+vm.runInContext(`state.trainingResults=[
+ {topic:'kos',stage:1,ok:true,attempts:1,hints:0,time:10,ts:Date.now()},
+ {topic:'kos',stage:1,ok:true,attempts:1,hints:1,time:20,ts:Date.now()},
+ {topic:'kos',stage:3,ok:true,attempts:2,hints:0,time:30,ts:Date.now()}
+]`,context);
+passport=vm.runInContext('calcPassport()',context);
+assert.equal(passport.detection,50);assert.equal(passport.ruleUse,0);assert.equal(passport.recognition,null);
+assert.equal(passport.selfCorrection,100);assert.equal(passport.speed,'20 с/задание');assert.equal(passport.streak,1);
+// Reopening a completed training session must not silently restart its first task.
+vm.runInContext("state.directTopic=true;state.trainingQueue=['x'];state.trainingIndex=1;renderTrainer()",context);
+assert.equal(location.hash,'#result');
+const historyLength=vm.runInContext('state.trainingResults.length',context);
+vm.runInContext("navigate('trainer')",context);
+assert.equal(location.hash,'#trainer');
+assert.equal(vm.runInContext('state.trainingIndex',context),0);
+assert.equal(vm.runInContext('state.trainingSessionStart',context),historyLength);
+assert.equal(vm.runInContext('state.trainingResults.length',context),historyLength,'new lesson must retain passport history');
+assert.equal(vm.runInContext('state.activeTask',context),null);
+vm.runInContext('renderTrainer()',context);
+assert.ok(get('#main').innerHTML.includes('trainerTask'),'continuing completed training must open a real new task');
+vm.runInContext('state.diagnosticResults=[];state.trainingResults=[];state.trainingSessionStart=0;renderResult()',context);
+assert.ok(get('#main').innerHTML.includes('Пока нет данных'));
+assert.equal(vm.runInContext('diagnosticSummary().strong',context),null);
+assert.equal(vm.runInContext('diagnosticSummary().weak',context),null);
+// Student dashboard contains actual local progress and an honest initial state.
+vm.runInContext('state=freshState();renderStudent()',context);
+let dashboard=get('#main').innerHTML;
+assert.ok(dashboard.includes('История пока пуста'));
+assert.ok(dashboard.includes('Начать диагностику'));
+assert.ok(dashboard.includes('Выбрать тему самостоятельно'));
+assert.ok(!dashboard.includes('Илья')&&!dashboard.includes('43%')&&!dashboard.includes('Демо-данные'));
+vm.runInContext(`state.directTopic=true;state.trainingQueue=['t1','t2'];state.trainingIndex=1;
+state.trainingResults=[{taskId:'t1',topic:'kos',stage:1,ok:true,attempts:1,hints:0,time:12,ts:Date.now()}];renderStudent()`,context);
+dashboard=get('#main').innerHTML;
+assert.ok(dashboard.includes('1 из 2 заданий'));
+assert.ok(dashboard.includes('1 из 1'));
+assert.ok(dashboard.includes('Попыток: 1 · подсказок: 0'));
+assert.ok(dashboard.includes('50%'));
+assert.ok(!dashboard.includes('История пока пуста'));
+// A game rerender cannot turn a corrected answer into a first-attempt success.
+location.hash='#games?mode=build';
+const tiles=games.buildRounds[0].options.map(piece=>{const el=new Element();el.dataset.piece=piece;return el;});
+context.document.querySelectorAll=s=>s==='.constructor-tile'?tiles:[];
+data.routeMap.games();
+tiles.find(el=>el.dataset.piece!==games.buildRounds[0].answer).onclick();get('#advancedCheck').onclick();
+assert.equal(games.getRun().attempts,1);
+data.routeMap.games();
+tiles.find(el=>el.dataset.piece===games.buildRounds[0].answer).onclick();get('#advancedCheck').onclick();
+assert.equal(games.getRun().attempts,2);assert.equal(games.getRun().firstTry,0);assert.equal(games.getRun().solved,true);
+context.document.querySelectorAll=()=>[];
 storage.setItem('orfozor-state','test');storage.setItem('orfozor-games','test');storage.setItem('other-project','keep');
 vm.runInContext('resetDemo()',context);
 assert.equal(storage.getItem('orfozor-state'),null);assert.equal(storage.getItem('orfozor-games'),null);assert.equal(storage.getItem('other-project'),'keep');assert.ok(location.reloaded);

@@ -1,5 +1,6 @@
 name: Deploy OrfoZor AI to GitHub Pages
 on:
+  pull_request:
   push:
     branches: [main]
   workflow_dispatch:
@@ -8,10 +9,30 @@ permissions:
   pages: write
   id-token: write
 concurrency:
-  group: pages
+  group: pages-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Check JavaScript syntax
+        run: |
+          node --check app.js
+          node --check curriculum-plus.js
+          node --check games-plus.js
+      - name: Check content, answers and routes
+        run: node tests/editorial-checks.cjs
+      - name: Check progress recovery
+        run: node tests/storage-checks.cjs
+      - name: Check printable worksheets
+        run: node tests/worksheet-checks.cjs
   deploy:
+    needs: validate
+    if: github.event_name != 'pull_request'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
