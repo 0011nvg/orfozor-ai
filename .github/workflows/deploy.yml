@@ -1,4 +1,4 @@
-name: Deploy OrfoZor AI to GitHub Pages
+name: Deploy Orfozor to GitHub Pages
 on:
   pull_request:
   push:
@@ -19,17 +19,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - name: Check JavaScript syntax
-        run: |
-          node --check app.js
-          node --check curriculum-plus.js
-          node --check games-plus.js
-      - name: Check content, answers and routes
-        run: node tests/editorial-checks.cjs
-      - name: Check progress recovery
-        run: node tests/storage-checks.cjs
-      - name: Check printable worksheets
-        run: node tests/worksheet-checks.cjs
+      - name: Install test dependencies
+        run: npm ci
+      - name: Check content, answer checking and progress logic
+        run: npm test
+
   deploy:
     needs: validate
     if: github.event_name != 'pull_request'
@@ -44,10 +38,14 @@ jobs:
         uses: actions/configure-pages@v5
         with:
           enablement: true
+      - name: Prepare site (without tests and dev files)
+        run: |
+          mkdir _site
+          cp -r index.html 404.html sw.js manifest.webmanifest .nojekyll css js assets _site/
       - name: Upload static website
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
