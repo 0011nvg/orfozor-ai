@@ -171,7 +171,7 @@ function lettersType(body, item, onChange) {
   let sel = new Set();
   let anchor = null;
   let locked = false;
-  body.innerHTML = `${range ? '<p class="ex-note">Нажми на первую и последнюю букву. Чтобы начать заново, нажми на любую букву ещё раз.</p>' : ''}<div class="letters ${range ? 'is-range' : ''}" role="group" aria-label="Буквы слова">${letters.map((l, i) => `<button type="button" class="letter" data-i="${i}" aria-pressed="false" aria-label="${i + 1}-я буква: ${esc(l)}">${esc(l)}</button>`).join('')}</div>`;
+  body.innerHTML = `${range ? '<p class="ex-note">Нажми на первую и последнюю букву. Чтобы начать заново, нажми на любую букву ещё раз.</p>' : ''}<div class="letters ${range ? 'is-range' : ''} ${letters.length > 10 ? 'is-long' : ''}" role="group" aria-label="Буквы слова">${letters.map((l, i) => `<button type="button" class="letter" data-i="${i}" aria-pressed="false" aria-label="${i + 1}-я буква: ${esc(l)}">${esc(l)}</button>`).join('')}</div>`;
   const btns = [...body.querySelectorAll('.letter')];
   const draw = () => btns.forEach((b, i) => b.setAttribute('aria-pressed', sel.has(i)));
   body.addEventListener('click', (e) => {
