@@ -3,15 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Орфозор — русский язык, 5–6 класс</title>
-  <meta name="description" content="Орфозор — бесплатный тренажёр русского языка для 5–6 классов: правила простым языком, интерактивная практика, проверка себя и повторение ошибок. Материалы для учителя и печатные листы.">
-  <meta name="theme-color" content="#FBF8F2">
+  <title>Орфозор — интеллектуальный тренажёр орфографии, 5–6 класс</title>
+  <meta name="description" content="Орфозор — интеллектуальный тренажёр орфографии русского языка для 5–6 классов: адаптивная модель знаний, диагностика ошибок, персональные рекомендации, интервальное повторение. Материалы для учителя и инструменты педагогического исследования.">
+  <meta name="theme-color" content="#F8F1E7">
   <meta property="og:title" content="Орфозор — русский язык, 5–6 класс">
   <meta property="og:description" content="Замечай орфограммы. Объясняй выбор. Пиши грамотно.">
   <meta property="og:type" content="website">
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="preload" href="assets/fonts/golos-text-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/literata-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/prata-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/app.css">
   <script type="module" src="js/main.js"></script>
 </head>
@@ -20,14 +21,16 @@
   <header class="site-header">
     <div class="header-inner">
       <a class="logo" href="#/" aria-label="Орфозор — на главную">
-        <span class="logo-word" aria-hidden="true">орф<span class="logo-eye"><span></span></span>зор</span>
+        <span class="logo-mark" aria-hidden="true">О</span>
+        <span class="logo-text" aria-hidden="true"><span class="logo-word">Орфозор</span><span class="logo-sub">русское письмо · 5–6 класс</span></span>
       </a>
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Меню</button>
       <nav class="nav" id="site-nav" aria-label="Основные разделы">
-        <a href="#/learn" data-nav="learn">Темы</a>
+        <a href="#/learn" data-nav="learn">Учебник</a>
         <a href="#/review" data-nav="review">Повторение <span class="nav-badge" hidden></span></a>
-        <a href="#/progress" data-nav="progress">Мой прогресс</a>
+        <a href="#/path" data-nav="path">Мой путь</a>
         <a href="#/teacher" data-nav="teacher">Учителю</a>
+        <a href="#/research" data-nav="research">Исследование</a>
         <a href="#/about" data-nav="about">О проекте</a>
       </nav>
     </div>
@@ -38,8 +41,8 @@
   </main>
   <footer class="site-footer">
     <div class="footer-inner">
-      <p><b>Орфозор</b> — тренажёр русского языка для 5–6 классов. Бесплатно, без регистрации и рекламы.</p>
-      <p>Прогресс хранится только в вашем браузере. <a href="#/about">Методика и авторы</a></p>
+      <p class="footer-brand"><b>Орфозор</b> · интеллектуальный тренажёр орфографии для 5–6 классов</p>
+      <p>Бесплатно, без регистрации и рекламы. Данные ученика хранятся только в его браузере. <a href="#/about">Методика и авторы</a></p>
     </div>
   </footer>
 </body>

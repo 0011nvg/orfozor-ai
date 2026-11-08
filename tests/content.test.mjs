@@ -14,7 +14,7 @@ const dicDir = new URL('../node_modules/dictionary-ru/', import.meta.url);
 const spell = nspell(fs.readFileSync(new URL('index.aff', dicDir)), fs.readFileSync(new URL('index.dic', dicDir)));
 
 // Слова, которых нет в словаре Hunspell, но которые нормативны (проверены по орфографическому словарю на Грамоте).
-const KNOWN_GOOD = new Set(['выгарки', 'зоревать', 'зарянка', 'межинститутский', 'предыюльский', 'лисицын']);
+const KNOWN_GOOD = new Set(['выгарки', 'зоревать', 'зарянка', 'межинститутский', 'предыюльский', 'лисицын', 'сестрицын']);
 // Пары, где оба варианта — существующие слова, а выбор решает смысл предложения.
 const BOTH_EXIST = new Set(['поласкать', 'полоскать', 'развевается', 'развивается', 'прибывает', 'пребывает', 'горячий', 'ставь']);
 
@@ -26,7 +26,7 @@ test('темы: обязательные поля и разделы', () => {
   for (const t of TOPICS) {
     assert.ok(!ids.has(t.id), 'повтор id темы ' + t.id);
     ids.add(t.id);
-    for (const f of ['title', 'short', 'frp', 'goal', 'rule', 'steps', 'examples', 'pitfalls', 'hints', 'cat', 'use', 'items']) {
+    for (const f of ['title', 'short', 'frp', 'goal', 'rule', 'steps', 'examples', 'pitfalls', 'hints', 'memo', 'use', 'items']) {
       assert.ok(t[f] && (typeof t[f] === 'string' ? t[f].trim() : t[f].length), `${t.id}: нет поля ${f}`);
     }
     assert.ok([5, 6].includes(t.grade), t.id);
@@ -161,4 +161,48 @@ test('орфография: неверные варианты действите
     });
   }
   assert.deepEqual(realWords, [], 'Отвлекающий вариант оказался существующим словом — задание может быть неоднозначным:\n' + realWords.join('\n'));
+});
+
+/* ---------- контрольно-измерительные материалы (срезы) ---------- */
+import { TESTS } from '../js/content/tests.js';
+import { topicById as TOPIC_BY_ID } from '../js/content/index.js';
+
+test('срезы: параллельные формы покрывают одинаковые темы', () => {
+  for (const [grade, forms] of Object.entries(TESTS)) {
+    const topicsA = forms.A.map((i) => i.topicId).sort().join();
+    const topicsB = forms.B.map((i) => i.topicId).sort().join();
+    assert.equal(topicsA, topicsB, `класс ${grade}`);
+    for (const i of [...forms.A, ...forms.B]) {
+      assert.ok(TOPIC_BY_ID[i.topicId], i.topicId);
+      assert.equal(TOPIC_BY_ID[i.topicId].grade, Number(grade), i.topicId);
+      assert.equal(checkItem(i, solution(i)).ok, true, i.text || i.q);
+    }
+  }
+});
+
+test('срезы: задания не повторяют тренировочные', () => {
+  const practice = new Set(TOPICS.flatMap((t) => t.items.map((i) => (i.text ? solvedGaps(i.text) : i.q))));
+  const practiceWords = new Set(TOPICS.flatMap((t) => t.items.filter((i) => i.t === 'gap').flatMap((i) => words(solvedGaps(i.text)))));
+  for (const forms of Object.values(TESTS)) for (const i of [...forms.A, ...forms.B]) {
+    const key = i.text ? solvedGaps(i.text) : i.q;
+    assert.ok(!practice.has(key), 'повтор задания: ' + key);
+    if (i.t === 'gap' && !i.ctx) for (const w of words(solvedGaps(i.text))) assert.ok(!practiceWords.has(w), `слово «${w}» уже есть в тренировке`);
+  }
+});
+
+test('срезы: орфография верных и неверных вариантов', () => {
+  const problems = [];
+  for (const forms of Object.values(TESTS)) for (const i of [...forms.A, ...forms.B]) {
+    if (i.t !== 'gap') continue;
+    for (const w of words(solvedGaps(i.text))) if (!known(w)) problems.push('нет в словаре: ' + w);
+    if (i.ctx || /[-]/.test(i.text)) continue;
+    const gaps = parseGaps(i.text).filter((p) => p.gap);
+    const right = gaps.map((g) => g.correct);
+    gaps.forEach((g, gi) => g.options.filter((o) => o !== g.correct).forEach((o) => {
+      const resp = [...right];
+      resp[gi] = o;
+      for (const w of words(fillGaps(i.text, resp))) if (!words(solvedGaps(i.text)).includes(w) && spell.correct(w)) problems.push(`вариант «${w}» существует`);
+    }));
+  }
+  assert.deepEqual(problems, []);
 });

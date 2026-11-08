@@ -1,6 +1,6 @@
 // Офлайн-режим: сначала сеть, при её отсутствии — сохранённая копия.
 // Так обновления сайта видны сразу, а в классе без интернета Орфозор продолжает работать.
-const CACHE = 'orfozor-v2';
+const CACHE = 'orfozor-v3';
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));

@@ -1,6 +1,10 @@
 import { esc, md, plural } from '../core/util.js';
-import { catSays } from '../ui/cat.js';
+import { levelLabel } from '../core/model.js';
+import { errorProfile } from '../core/diagnose.js';
 import { sectionsOfGrade, topicById, topicsOfGrade } from '../content/index.js';
+
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+export const paragraphNo = (t) => topicsOfGrade(t.grade).indexOf(t) + 1;
 import { statusChip, paras, gradeTabs, pickGrade, crumbs } from './shared.js';
 
 const norm = (s) => s.toLowerCase().replace(/ё/g, 'е');
@@ -14,7 +18,7 @@ export function renderLearn(main, { store, params }) {
   main.innerHTML = `<section class="page">
     <div class="page-head">
       <div>
-        <p class="eyebrow">Темы</p>
+        <p class="eyebrow">Учебник · орфография и пунктуация</p>
         <h1>Русский язык, ${grade} класс</h1>
       </div>
       ${gradeTabs(grade, '#/learn')}
@@ -29,11 +33,12 @@ export function renderLearn(main, { store, params }) {
       <input id="topic-search" type="search" placeholder="Например: приставки, -тся, пол-, кое-что" autocomplete="off" spellcheck="false">
     </div>
     <p class="search-empty" hidden>Ничего не нашлось. Попробуй другое слово или посмотри темы другого класса.</p>
-    ${sections.map((sec) => `<section class="topic-section" data-section>
-      <h2 class="h3">${esc(sec.title)}</h2>
+    ${sections.map((sec, si) => `<section class="topic-section" data-section>
+      <h2 class="chapter"><span class="chapter-no">Глава ${ROMAN[si]}</span>${esc(sec.title)}</h2>
       <ul class="topic-list">${sec.topics.map((t) => {
         const hay = norm([t.title, t.short, ...t.examples.map((e) => e[0]), ...t.traps.map((e) => e[0])].join(' '));
-        return `<li data-hay="${esc(hay)}"><a class="topic-row" href="#/topic/${t.id}"><span class="topic-row-main"><b>${esc(t.title)}</b><span>${esc(t.short)}</span></span>${statusChip(store.topicStatus(t.id))}</a></li>`;
+        const p = store.pL(t.id);
+        return `<li data-hay="${esc(hay)}"><a class="topic-row" href="#/topic/${t.id}"><span class="para-no">§ ${paragraphNo(t)}</span><span class="topic-row-main"><b>${esc(t.title)}</b><span>${esc(t.short)}</span></span><span class="topic-row-side">${statusChip(store.topicStatus(t.id))}${p !== null ? `<span class="mini-meter" title="Оценка модели знаний"><span style="width:${Math.round(p * 100)}%"></span></span>` : ''}</span></a></li>`;
       }).join('')}</ul>
     </section>`).join('')}
   </section>`;
@@ -62,12 +67,14 @@ export function renderTopic(main, { store, args }) {
   const st = store.state.topics[t.id];
   const status = store.topicStatus(t.id);
   const lastCheck = st?.checks?.at(-1);
-  const showCat = store.state.settings.cat !== false;
   const due = store.dueReview().filter((r) => r.topic === t.id).length;
+  const p = store.pL(t.id);
+  const prof = errorProfile(store.state.errors, t.id).slice(0, 2);
 
   main.innerHTML = `<article class="page topic-page">
     ${crumbs([['#/learn?grade=' + t.grade, `${t.grade} класс`], [null, t.title]])}
     <header class="topic-head">
+      <p class="eyebrow">§ ${paragraphNo(t)} · ${t.grade} класс</p>
       <h1>${esc(t.title)}</h1>
       <p class="lead">${esc(t.short)}</p>
       <div class="topic-status">${statusChip(status)}${lastCheck ? `<span class="muted">Последняя проверка: ${lastCheck.score} из ${lastCheck.total}</span>` : ''}</div>
@@ -76,10 +83,10 @@ export function renderTopic(main, { store, args }) {
     <div class="topic-grid">
       <div class="topic-main">
         <section class="rule-card" aria-labelledby="rule-h">
-          <h2 id="rule-h" class="h3">Правило</h2>
-          ${paras(t.rule)}
+          <h2 id="rule-h" class="rule-title">Правило</h2>
+          <div class="rule-text">${paras(t.rule)}</div>
+          <p class="rule-memo"><span class="memo-label">Запомни</span>${md(t.memo)}</p>
         </section>
-        ${catSays(md(t.cat), { mood: 'idle', show: showCat, tone: 'is-tip' })}
         <section aria-labelledby="steps-h">
           <h2 id="steps-h" class="h3">Как рассуждать</h2>
           <ol class="algo">${t.steps.map((s) => `<li>${md(s)}</li>`).join('')}</ol>
@@ -94,9 +101,10 @@ export function renderTopic(main, { store, args }) {
         </section>` : ''}
       </div>
       <aside class="topic-side" aria-label="Занятия по теме">
+        ${p !== null ? `<div class="side-card side-model"><h2 class="h4">Модель знаний</h2><div class="model-big"><b>${Math.round(p * 100)} %</b><span>${levelLabel(p)}</span></div><span class="mm-track"><span style="width:${Math.round(p * 100)}%"></span></span>${prof.length ? `<p class="small">Чаще всего: ${prof.map((x) => `«${esc(x.title.toLowerCase())}»`).join(', ')}.</p>` : ''}</div>` : ''}
         <div class="side-card">
-          <h2 class="h4">Потренироваться</h2>
-          <p>Задания по шагам: заметить → распознать → применить → перенести в предложение. Есть подсказки.</p>
+          <h2 class="h4">Адаптивная тренировка</h2>
+          <p>Задания подбирает модель знаний: от «заметить орфограмму» до «применить в предложении». Есть подсказки.</p>
           <a class="btn btn-primary btn-block" href="#/practice/${t.id}">Начать тренировку</a>
         </div>
         <div class="side-card">

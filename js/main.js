@@ -2,8 +2,9 @@
 import { createStore } from './core/store.js';
 import { renderHome } from './views/home.js';
 import { renderLearn, renderTopic } from './views/learn.js';
-import { renderPractice, renderCheck, renderReview, renderDiagnostic, renderMixed, renderAssignment } from './views/run.js';
-import { renderProgress } from './views/progress.js';
+import { renderPractice, renderCheck, renderReview, renderDiagnostic, renderMixed, renderAssignment, renderTest } from './views/run.js';
+import { renderPath } from './views/path.js';
+import { renderResearch } from './views/research.js';
 import { renderTeacher, renderTeacherTopic, renderPrint } from './views/teacher.js';
 import { renderAbout } from './views/about.js';
 
@@ -20,7 +21,9 @@ const routes = [
   [/^diagnostic\/([56])$/, renderDiagnostic],
   [/^mixed\/([56])$/, renderMixed],
   [/^run$/, renderAssignment],
-  [/^progress$/, renderProgress],
+  [/^(?:path|progress)$/, renderPath],
+  [/^test\/([56])\/(pre|post)$/, renderTest],
+  [/^research$/, renderResearch],
   [/^teacher$/, renderTeacher],
   [/^teacher\/([\w-]+)$/, renderTeacherTopic],
   [/^print$/, renderPrint],
@@ -41,7 +44,7 @@ function applySettings() {
 
 function updateNav(path) {
   const section = path.split('/')[0];
-  const map = { topic: 'learn', practice: 'learn', check: 'learn', diagnostic: 'learn', mixed: 'learn', print: 'teacher' };
+  const map = { topic: 'learn', practice: 'learn', check: 'learn', diagnostic: 'learn', mixed: 'learn', print: 'teacher', progress: 'path', test: 'research' };
   const current = map[section] || section || 'home';
   document.querySelectorAll('.nav a').forEach((a) => {
     if (a.dataset.nav === current) a.setAttribute('aria-current', 'page');
@@ -77,7 +80,7 @@ function route() {
   const h1 = main.querySelector('h1');
   if (h1 && !main.querySelector('.run')) { h1.setAttribute('tabindex', '-1'); h1.focus({ preventScroll: true }); }
   const title = h1 ? h1.textContent.trim() : '';
-  document.title = title && path ? `${title} — Орфозор` : 'Орфозор — русский язык, 5–6 класс';
+  document.title = title && path ? `${title} — Орфозор` : 'Орфозор — интеллектуальный тренажёр орфографии, 5–6 класс';
 }
 
 document.querySelector('.nav-toggle').addEventListener('click', (e) => {

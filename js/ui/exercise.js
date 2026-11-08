@@ -13,7 +13,7 @@ const DEFAULT_Q = {
 // После неудачной попытки отметки «верно/неверно» остаются видны, пока ученик не начнёт исправлять.
 const clearMarks = (body) => body.querySelectorAll('.is-right, .is-wrong, .is-missed').forEach((el) => el.classList.remove('is-right', 'is-wrong', 'is-missed'));
 
-const optLabel = (o) => (o === '' ? '—' : o);
+const optLabel = (o) => (o === '' ? '∅' : o);
 const optAria = (o) => (o === '' ? 'ничего не писать' : o);
 
 export function mountExercise(root, item, { onChange = () => {}, seed } = {}) {

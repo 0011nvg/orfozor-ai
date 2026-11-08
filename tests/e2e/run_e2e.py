@@ -22,8 +22,10 @@ CHROME = '/usr/bin/google-chrome'
 PLAN_JS = """
 async (id) => {
   const { itemById } = await import('./js/content/index.js');
+  const { TESTS } = await import('./js/content/tests.js');
   const C = await import('./js/core/check.js');
-  const it = itemById[id];
+  const testItems = Object.values(TESTS).flatMap((f) => [...f.A, ...f.B]);
+  const it = itemById[id] || testItems.find((x) => x.id === id);
   const card = document.querySelector('.ex-card');
   const acts = [];
   const sel = (s) => ({ click: s });
@@ -75,7 +77,7 @@ async def main():
         for n in range(len(ids)):
             item_id = await solve_current(page)
             await page.click('.js-check')
-            ok = await page.locator('.run-feedback .cat-line.is-right').count()
+            ok = await page.locator('.run-feedback .note-line.is-right').count()
             if not ok:
                 fb = await page.inner_text('.run-feedback')
                 failures.append(f'Верный ответ не принят: {item_id}: {fb[:120]}')
@@ -98,7 +100,7 @@ async def main():
         await page.wait_for_selector('.ex-card')
         # первое задание: берём подсказку, затем отвечаем верно → не «сам», уходит в повторение
         await page.click('.js-hint')
-        if not await page.locator('.cat-line.is-hint').count():
+        if not await page.locator('.note-line.is-hint').count():
             failures.append('Подсказка не показана')
         await solve_current(page)
         await page.click('.js-check')
@@ -112,7 +114,7 @@ async def main():
                 if (await b.inner_text()).strip() != right:
                     await b.click(); break
             await page.click('.js-check')
-            state = await page.locator('.run-feedback .cat-line').get_attribute('class')
+            state = await page.locator('.run-feedback .note-line').get_attribute('class')
             if 'is-right' in state:
                 failures.append('Неверный вариант засчитан как верный')
         # дорешиваем тренировку
@@ -165,7 +167,7 @@ async def main():
             failures.append('Тема не получила статус «освоена»')
 
         # ---------- 4. Все маршруты, ошибки JS, ширина на телефоне ----------
-        routes = ['/', '/learn', '/learn?grade=6', '/topic/g6-nn', '/practice/g6-num', '/check/g5-homo', '/review', '/diagnostic/5', '/mixed/5', '/mixed/6', '/progress', '/teacher', '/teacher/g5-address', '/about', '/nope']
+        routes = ['/', '/learn', '/learn?grade=6', '/topic/g6-nn', '/practice/g6-num', '/check/g5-homo', '/review', '/diagnostic/5', '/mixed/5', '/mixed/6', '/path', '/teacher', '/teacher/g5-address', '/research', '/test/5/pre', '/about', '/nope']
         for r in routes:
             await page.goto(BASE + '#' + r)
             await page.wait_for_timeout(250)
@@ -202,6 +204,90 @@ async def main():
         await page.click('.js-start')
         if not await page.locator('.ex-card').count():
             failures.append('Ссылка для учеников не открывает задания')
+
+        # ---------- 6. Исследование: срез → файл участника → анализ ----------
+        await page.goto(BASE + '#/test/6/pre?group=Э')
+        await page.fill('input[name=code]', '6Б-07')
+        await page.click('.test-form button[type=submit]')
+        await page.wait_for_selector('.ex-card')
+        if await page.locator('.js-hint').count():
+            failures.append('В срезе доступны подсказки')
+        n_test = 0
+        while not await page.locator('.summary').count():
+            await solve_current(page)
+            await page.click('.js-check')
+            if await page.locator('.note-line.is-right').count():
+                failures.append('Срез показывает правильность ответа до окончания')
+                break
+            await page.click('.js-check')
+            n_test += 1
+        txt = await page.inner_text('.summary')
+        if f'{n_test} из {n_test}' not in txt:
+            failures.append('Срез: неверный итог ' + txt[:60])
+        await page.goto(BASE + '#/path')
+        async with page.expect_download() as dl:
+            await page.click('.js-research')
+        path = await (await dl.value).path()
+        data = json.load(open(path, encoding='utf-8'))
+        if data.get('participant', {}).get('code') != '6Б-07' or data['participant'].get('group') != 'Э' or not data.get('tests'):
+            failures.append('Файл исследования неполный')
+        if 'name' in json.dumps(data, ensure_ascii=False).lower():
+            failures.append('В файле исследования есть поле name')
+        await page.goto(BASE + '#/research')
+        await page.set_input_files('.js-files', path)
+        await page.wait_for_selector('.results table')
+        res_text = await page.inner_text('.results')
+        if '6Б-07' not in res_text:
+            failures.append('Файл участника не попал в анализ')
+        await page.click('.js-demo')
+        await page.wait_for_selector('.demo-banner')
+        res_text = await page.inner_text('.results')
+        if 'Уилкоксон' not in res_text or 'Спирмена' not in res_text:
+            failures.append('Анализ демонстрационных данных не построен')
+        async with page.expect_download() as dl2:
+            await page.click('.js-csv1')
+        csv = open(await (await dl2.value).path(), encoding='utf-8-sig').read()
+        if not csv.startswith('код;группа') or csv.count('\n') < 24:
+            failures.append('CSV участников некорректен')
+
+        # ---------- 7. Адаптивная тренировка: модель знаний меняется ----------
+        await page.goto(BASE + '#/practice/g5-root')
+        await page.wait_for_selector('.model-meter')
+        first_step = await page.inner_text('.chip-step')
+        if 'ЗАМЕЧАЮ' not in first_step.upper():
+            failures.append('Первое задание новой темы не на поиск орфограммы: ' + first_step)
+        for _ in range(14):
+            if await page.locator('.summary').count():
+                break
+            await solve_current(page)
+            await page.click('.js-check')
+            await page.click('.js-check')
+        change = await page.inner_text('.model-change') if await page.locator('.model-change').count() else ''
+        print('Модель знаний после тренировки:', change.replace('\n', ' '))
+        import re
+        after = re.findall(r'→\s*(\d+)', change)
+        if not after or int(after[0]) < 95:
+            failures.append('Модель знаний не достигла порога после верных ответов: ' + change)
+
+        # ---------- 8. ИИ-наставник (сервис подменён заглушкой) ----------
+        ai_ctx = await browser.new_context(viewport={'width': 1280, 'height': 900})
+        ai = await ai_ctx.new_page()
+        await ai.route('**/js/config.js', lambda r: r.fulfill(content_type='text/javascript', body="export const CONFIG = { aiEndpoint: 'https://ai.example.test/tutor' };"))
+        await ai.route('https://ai.example.test/**', lambda r: r.fulfill(content_type='application/json', headers={'Access-Control-Allow-Origin': '*'}, body=json.dumps({'text': 'Корень -лаг- проверять ударением нельзя: перед Г пишется А, поэтому верно предлагать.'})))
+        await ai.goto(BASE)
+        gid = await ai.evaluate("(async () => (await import('./js/content/index.js')).topicById['g5-alt-letter'].items.find(i => i.t === 'gap' && i.text === 'предл[а/о]гать').id)()")
+        await ai.goto(BASE + '#/run?items=' + gid + '&title=AI')
+        await ai.click('.js-start')
+        await ai.click('.gap-options .opt[data-o="о"]')
+        await ai.click('.js-check')
+        if not await ai.locator('.js-ai').count():
+            failures.append('Кнопка ИИ-наставника не появилась при подключённом сервисе')
+        else:
+            await ai.click('.js-ai')
+            await ai.wait_for_selector('.note-line.is-ai')
+            if 'предлагать' not in await ai.inner_text('.note-line.is-ai'):
+                failures.append('Ответ ИИ-наставника не показан')
+        await ai_ctx.close()
 
         await browser.close()
 

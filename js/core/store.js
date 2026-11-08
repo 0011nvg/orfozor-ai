@@ -2,6 +2,7 @@
 // Никаких персональных данных: ни имени, ни класса, ни школы. Сервер не нужен.
 
 import { DAY, today } from './util.js';
+import { BKT, bktUpdate } from './model.js';
 
 export const STORAGE_KEY = 'orfozor:v2';
 const BOXES = [1, 3, 7, 14, 30]; // интервалы повторения в днях
@@ -14,7 +15,11 @@ export function emptyState() {
     items: {},
     review: {},
     diag: {},
-    log: { fixedInReview: 0, days: [] },
+    log: { fixedInReview: 0, days: [], ms: 0 },
+    model: {}, // BKT: { [topicId]: { pL, n } }
+    errors: [], // { topicId, itemId, code, ts }
+    tests: [], // входные и итоговые срезы
+    profile: { code: '', group: '' }, // анонимный код для исследования
   };
 }
 
@@ -30,6 +35,10 @@ function sanitize(raw) {
     review: obj(raw.review),
     diag: obj(raw.diag),
     log: { ...base.log, ...obj(raw.log), days: Array.isArray(raw.log?.days) ? raw.log.days.slice(-400) : [] },
+    model: obj(raw.model),
+    errors: Array.isArray(raw.errors) ? raw.errors.slice(-1000) : [],
+    tests: Array.isArray(raw.tests) ? raw.tests.slice(-50) : [],
+    profile: { ...base.profile, ...obj(raw.profile) },
   };
 }
 
@@ -72,22 +81,55 @@ export function createStore(storage = globalThis.localStorage) {
     },
 
     // Результат одного ответа. firstTry — верно с первой попытки и без подсказок.
-    recordItem({ id, topicId, firstTry, mode }) {
+    // item передаётся, чтобы модель знаний учла форму задания (вероятность угадать).
+    recordItem({ id, topicId, firstTry, mode, item, errorCode, ms = 0 }) {
       const rec = (state.items[id] ||= { seen: 0, right: 0 });
       rec.seen += 1;
       if (firstTry) rec.right += 1;
       rec.last = firstTry;
-      const inReview = state.review[id];
-      if (!firstTry) {
-        // Ошибка или помощь → задание возвращается завтра.
-        state.review[id] = { topic: topicId, box: 0, due: today() + DAY };
-      } else if (inReview && mode === 'review') {
-        const box = inReview.box + 1;
-        if (box >= BOXES.length) delete state.review[id];
-        else state.review[id] = { ...inReview, box, due: today() + BOXES[box] * DAY };
-        state.log.fixedInReview += 1;
+      if (item) {
+        const m = (state.model[topicId] ||= { pL: BKT.L0, n: 0 });
+        m.pL = bktUpdate(m.pL, firstTry, item);
+        m.n += 1;
+        m.updated = Date.now();
+      }
+      if (errorCode) {
+        state.errors.push({ topicId, itemId: id, code: errorCode, ts: Date.now(), mode });
+        if (state.errors.length > 1000) state.errors.splice(0, state.errors.length - 1000);
+      }
+      state.log.ms = (state.log.ms || 0) + Math.min(ms, 5 * 60 * 1000);
+      if (mode !== 'test') {
+        const inReview = state.review[id];
+        if (!firstTry) {
+          // Ошибка или помощь → задание возвращается завтра.
+          state.review[id] = { topic: topicId, box: 0, due: today() + DAY };
+        } else if (inReview && mode === 'review') {
+          const box = inReview.box + 1;
+          if (box >= BOXES.length) delete state.review[id];
+          else state.review[id] = { ...inReview, box, due: today() + BOXES[box] * DAY };
+          state.log.fixedInReview += 1;
+        }
       }
       markDay();
+      persist();
+    },
+
+    logError({ topicId, itemId, code, mode }) {
+      state.errors.push({ topicId, itemId, code, ts: Date.now(), mode });
+      persist();
+    },
+
+    pL(topicId) {
+      return state.model[topicId]?.pL ?? null;
+    },
+
+    saveTest(record) {
+      state.tests.push(record);
+      persist();
+    },
+
+    setProfile(profile) {
+      state.profile = { ...state.profile, ...profile };
       persist();
     },
 
